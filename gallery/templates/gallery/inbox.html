@@ -1,0 +1,16 @@
+{% extends 'gallery/base.html' %}
+
+{% block content %}
+<h2>Beérkező üzenetek</h2>
+<ul class="message-list">
+    {% for message in messages %}
+    <li class="{% if not message.is_read %}unread{% endif %}">
+        <a href="{% url 'message_detail' message.pk %}">
+            <strong>{{ message.subject }}</strong> - {{ message.sender.username }} - {{ message.sent_at }}
+        </a>
+    </li>
+    {% empty %}
+    <p>Nincsenek üzeneteid.</p>
+    {% endfor %}
+</ul>
+{% endblock %}

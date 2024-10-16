@@ -1,0 +1,43 @@
+{% extends 'gallery/base.html' %}
+
+{% block content %}
+<h2>Saját fiók beállításai</h2>
+
+<h3>Profiladatok</h3>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ profile_form.as_p }}
+    <button type="submit">Mentés</button>
+</form>
+
+<h3>Saját feltöltött képek</h3>
+<div class="masonry-grid">
+    {% for image in images %}
+    <div class="masonry-item">
+        <div class="image-container">
+            <a href="{% url 'image_detail' image.pk %}">
+                <img src="{{ image.image_file.url }}" alt="{{ image.title }}">
+            </a>
+            <div class="image-overlay">
+                <p>{{ image.title }}</p>
+                <form method="post" action="{% url 'image_delete' image.pk %}" onsubmit="return confirm('Biztosan törölni szeretnéd ezt a képet?');">
+                    {% csrf_token %}
+                    <button type="submit">Törlés</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% if images|length == 0 %}
+    <p>Nincsenek feltöltött képeid.</p>
+    {% endif %}
+</div>
+
+<h3>Biztonsági beállítások</h3>
+<p><a href="{% url 'password_change' %}">Jelszó módosítása</a></p>
+
+{% endblock %}
+
+{% block scripts %}
+<!-- Ha szükséges, ide helyezd a JavaScript kódokat -->
+{% endblock %}

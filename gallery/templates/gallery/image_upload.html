@@ -1,0 +1,51 @@
+{% extends 'gallery/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="upload-container">
+    <h2>Új kép feltöltése</h2>
+    <div class="upload-form-container">
+        <form method="post" enctype="multipart/form-data" class="upload-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_image_file">Kép kiválasztása</label>
+                {{ form.image_file }}
+            </div>
+            <div class="form-group">
+                <label for="id_title">Cím</label>
+                {{ form.title }}
+            </div>
+            <div class="form-group">
+                <label for="id_description">Leírás</label>
+                {{ form.description }}
+            </div>
+            <div class="form-group">
+                <label for="id_tags">Címkék</label>
+                {{ form.tags }}
+            </div>
+            <button type="submit">Feltöltés</button>
+        </form>
+        <div class="image-preview">
+            <p>Kép előnézete:</p>
+            <img id="preview" src="#" alt="Előnézet" style="display: none;">
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Kép előnézet megjelenítése
+    document.getElementById('id_image_file').onchange = function (e) {
+        var preview = document.getElementById('preview');
+        var file = e.target.files[0];
+        if (file) {
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = 'block';
+        } else {
+            preview.src = '#';
+            preview.style.display = 'none';
+        }
+    };
+</script>
+{% endblock %}

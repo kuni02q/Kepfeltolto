@@ -1,0 +1,17 @@
+{% extends 'gallery/base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Keresési eredmények: "{{ query }}"</h2>
+<div class="gallery">
+    {% for image in images %}
+    <div class="gallery-item">
+        <a href="{% url 'image_detail' image.pk %}">
+            <img src="{{ image.image_file.url }}" alt="{{ image.title }}">
+        </a>
+    </div>
+    {% empty %}
+    <p>Nincs találat.</p>
+    {% endfor %}
+</div>
+{% endblock %}

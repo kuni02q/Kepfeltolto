@@ -1,0 +1,394 @@
+/* Alap stílusok */
+body {
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f8f8;
+    /* Nem alkalmazunk globális text-align-t a body-ra */
+}
+
+/* Konténer */
+.container {
+    width: 80%;
+    margin: 20px auto;
+    /* Nem alkalmazunk text-align-t itt sem */
+}
+
+/* Fejléc stílusai */
+.header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Középre igazítja a fejléc tartalmát */
+    background-color: #699BF7;
+    padding: 15px 20px;
+}
+
+.header-bar .logo {
+    width: 70px;
+    height: auto;
+}
+
+.site-title {
+    margin: 0;
+    font-size: 2em;
+    color: #fff;
+    text-align: center; /* Hozzáadva */
+}
+
+.site-title .best {
+    color: #9B2B46;
+}
+
+.site-title .gallery {
+    color: #539123;
+}
+
+/* Navigációs sáv stílusai */
+.navbar {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    background-color: #333;
+    display: flex;
+    justify-content: center;
+}
+
+.navbar li {
+    display: inline;
+}
+
+.navbar li a {
+    display: inline-block;
+    color: #fff;
+    text-align: center;
+    padding: 14px 20px;
+    text-decoration: none;
+}
+
+.navbar li a:hover {
+    background-color: #111;
+}
+
+/* Címsorok középre igazítása */
+h1, h2, h3 {
+    text-align: center;
+}
+
+/* Kereső űrlap stílusai */
+.search-form {
+    display: inline-block;
+    margin-left: 20px;
+}
+
+.search-form input[type="text"] {
+    padding: 5px;
+    font-size: 1em;
+    width: 200px;
+}
+
+.search-form button {
+    padding: 5px 10px;
+    font-size: 1em;
+    background-color: #699BF7;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.search-form button:hover {
+    background-color: #539123;
+}
+
+/* Galéria stílusai */
+.gallery {
+    column-count: 4;
+    column-gap: 15px;
+    margin-top: 60px;
+}
+
+.gallery-grid {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -10px;
+    width: auto;
+}
+
+.gallery-item {
+    width: 100%;
+    padding-left: 10px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.gallery-item h3 {
+    font-size: 1.2em;
+    margin: 10px 0 5px;
+    text-align: center; /* Hozzáadva */
+}
+
+.gallery-item p {
+    font-size: 0.9em;
+    color: #666;
+    text-align: center; /* Hozzáadva */
+}
+
+/* Kép részletező oldal stílusai */
+.image-detail {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.image-detail img {
+    max-width: 100%;
+    height: auto;
+}
+
+.image-detail h2 {
+    font-size: 2em;
+    margin-top: 20px;
+}
+
+.image-detail p {
+    font-size: 1em;
+    color: #333;
+}
+
+/* Gombok stílusai */
+button {
+    background-color: #699BF7;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin: 0 auto; /* Középre igazítja a gombot */
+    display: block; /* Szükséges a margin működéséhez */
+}
+
+button:hover {
+    background-color: #539123;
+}
+
+/* Űrlapok stílusai */
+form {
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: center; /* Középre igazítja az űrlap tartalmát */
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="password"],
+form input[type="date"],
+form textarea,
+form select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: left; /* Az input mezők szövege balra igazodik */
+}
+
+/* Üzenetek stílusai */
+.messages {
+    list-style: none;
+    padding: 0;
+    text-align: center; /* Hozzáadva, ha szükséges */
+}
+
+.messages li {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.messages li.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.messages li.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Lábjegyzet stílusai */
+footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}
+
+/* Reszponzív elrendezés a galériához */
+@media screen and (min-width: 600px) {
+    .gallery-item {
+        width: 50%;
+    }
+}
+
+@media screen and (min-width: 900px) {
+    .gallery-item {
+        width: 33.33%;
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    .gallery-item {
+        width: 25%;
+    }
+}
+
+/* Feltöltési oldal stílusai */
+.upload-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center; /* Hozzáadva */
+}
+
+.upload-container .form-group {
+    margin-bottom: 15px;
+}
+
+.upload-container label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-align: left; /* A címkék szövege balra igazodik */
+}
+
+.upload-container input,
+.upload-container textarea,
+.upload-container select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: left; /* Az input mezők szövege balra igazodik */
+}
+
+.upload-container button {
+    background-color: #699BF7;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin: 0 auto; /* Középre igazítja a gombot */
+    display: block;
+}
+
+.upload-container button:hover {
+    background-color: #539123;
+}
+
+/* Masonry grid stílusok */
+.masonry-grid {
+    column-count: 2;
+    column-gap: 10px;
+    padding: 10px;
+}
+
+@media screen and (min-width: 600px) {
+    .masonry-grid {
+        column-count: 3;
+    }
+}
+
+@media screen and (min-width: 900px) {
+    .masonry-grid {
+        column-count: 4;
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    .masonry-grid {
+        column-count: 5;
+    }
+}
+
+.masonry-item {
+    break-inside: avoid;
+    margin-bottom: 1em;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.image-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    padding: 0;
+}
+
+.masonry-grid .masonry-item .image-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.image-overlay {
+    position: absolute;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    width: 100%;
+    padding: 0.5em;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.image-container:hover .image-overlay {
+    opacity: 1;
+}
+
+.image-overlay p {
+    margin: 0;
+}
+
+.image-overlay form {
+    margin-top: 0.5em;
+}
+
+/* Üzenetek listája */
+.message-list {
+    list-style: none;
+    padding: 0;
+    text-align: left; /* Balra igazítás */
+}
+
+.message-list li {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.message-list li.unread {
+    background-color: #f0f8ff;
+    font-weight: bold;
+}
+
+.message-list a {
+    text-decoration: none;
+    color: #333;
+}
+
+.message-list a:hover {
+    text-decoration: underline;
+}
+
+/* További szükséges stílusok, ha vannak */
