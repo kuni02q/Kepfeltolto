@@ -5,38 +5,41 @@
     <title>Best Gallery</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/tagify.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/tagify.css' %}">
 </head>
 <body>
 
     <header>
         <div class="header-bar">
-            <a href="{% url 'image_list' %}" class="logo-container">
-                <img src="{% static 'images/logo.png' %}" alt="Best Gallery Logo" class="logo">
-            </a>
-            <h1>
-                <span class="best">Best</span>
-                <span class="gallery">Gallery</span>
-            </h1>
+            <div class="logo-title">
+                <a href="{% url 'image_list' %}" class="logo-container">
+                    <img src="{% static 'images/Frame 132.png' %}" alt="Best Gallery Logo" class="logo">
+                </a>
+                <h1 class="site-title">
+                    <span class="best">Best</span>
+                    <span class="gallery">Gallery</span>
+                </h1>
+            </div>
+            <nav>
+                <ul class="navbar">
+                    <li><a href="{% url 'image_list' %}">Főoldal</a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'search' %}">Kereső</a></li>
+
+                        <li><a href="{% url 'image_upload' %}">Fotó hozzáadása</a></li>
+                        <li><a href="{% url 'friend_search' %}">Barát keresés</a></li>
+                        <li><a href="{% url 'account_settings' %}">Saját fiók</a></li>
+                        <li><a href="{% url 'inbox' %}">Üzenetek</a></li>
+                        <li><a href="{% url 'logout' %}">Kijelentkezés</a></li>
+                        <li><a href="{% url 'help_page' %}">Segítség</a></li>
+                    {% else %}
+                        <li><a href="{% url 'login' %}?next={{ request.path }}">Bejelentkezés</a></li>
+                        <li><a href="{% url 'signup' %}">Regisztráció</a></li>
+                        <li><a href="{% url 'help_page' %}">Segítség</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
         </div>
-        <nav>
-            <ul class="navbar">
-                <li><a href="{% url 'image_list' %}">Főoldal</a></li>
-                {% if user.is_authenticated %}
-                    <li><a href="{% url 'search' %}">Kereső</a></li>
-                    <li><a href="{% url 'image_upload' %}">Fotó hozzáadása</a></li>
-                    <li><a href="{% url 'friend_search' %}">Barát keresés</a></li>
-                    <li><a href="{% url 'account_settings' %}">Saját fiók</a></li>
-                    <li><a href="{% url 'inbox' %}">Üzenetek</a></li>
-                    <li><a href="{% url 'logout' %}">Kijelentkezés</a></li>
-                    <li><a href="{% url 'help_page' %}">Segítség</a></li>
-                {% else %}
-                    <li><a href="{% url 'login' %}?next={{ request.path }}">Bejelentkezés</a></li>
-                    <li><a href="{% url 'signup' %}">Regisztráció</a></li>
-                    <li><a href="{% url 'help_page' %}">Segítség</a></li>
-                {% endif %}
-            </ul>
-        </nav>
     </header>
     <div class="container">
         {% block content %}
@@ -46,31 +49,33 @@
         <p>&copy; {{ current_year|default:"2024" }} Best Gallery. Minden jog fenntartva.</p>
     </footer>
 {% block scripts %}
-<script src="{% static 'js/tabify.min.js' %}"></script>
+<script src="{% static 'js/tagify.js' %}"></script>
 <script>
     // Keresőmező Tagify inicializálása
     var input = document.querySelector('.search-form input[name="q"]');
-    var tagify = new Tagify(input, {
-        whitelist: [],
-        dropdown: {
-            classname: "tags-look",
-            enabled: 0,
-            maxItems: 5,
-            position: "all",
-            closeOnSelect: false
-        }
-    });
-
-    // Címke ajánlások betöltése
-    fetch("{% url 'tag_list' %}")
-        .then(response => response.json())
-        .then(function(whitelist){
-            // A '#' jel hozzáadása a címkékhez
-            whitelist = whitelist.map(function(tag) {
-                return '#' + tag;
-            });
-            tagify.settings.whitelist = whitelist;
+    if (input) {
+        var tagify = new Tagify(input, {
+            whitelist: [],
+            dropdown: {
+                classname: "tags-look",
+                enabled: 0,
+                maxItems: 5,
+                position: "all",
+                closeOnSelect: false
+            }
         });
+
+        // Címke ajánlások betöltése
+        fetch("{% url 'tag_list' %}")
+            .then(response => response.json())
+            .then(function(whitelist){
+                // A '#' jel hozzáadása a címkékhez
+                whitelist = whitelist.map(function(tag) {
+                    return '#' + tag;
+                });
+                tagify.settings.whitelist = whitelist;
+            });
+    }
 </script>
 {% endblock %}
 </body>

@@ -17,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+# m/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-_o!xy7^+_=1n-l0($xlx$n(ho36q+^tgx3q_r1^0i+$)9owoxp'
@@ -117,12 +117,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
+#STATICFILES_DIRS = [
+ #   BASE_DIR / 'static',
+  #  # Ha az alkalmazásod saját statikus mappát használ:
+   # BASE_DIR / 'gallery' / 'static',
+#]*/
 # STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
+OPENAI_API_KEY = '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'
 #LOGOUT_REDIRECT_URL = 'image_list'
 LOGIN_URL = '/login/'  # Ha szükséges
 LOGIN_REDIRECT_URL = 'image_list'

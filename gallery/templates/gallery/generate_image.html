@@ -1,0 +1,19 @@
+{% extends 'gallery/base.html' %}
+
+{% block content %}
+<h2>Kép generálása AI-val</h2>
+{% if error %}
+<p style="color:red;">Hiba történt: {{ error }}</p>
+{% endif %}
+<form method="post">
+    {% csrf_token %}
+    <label for="prompt">Leírás:</label>
+    <input type="text" name="prompt" id="prompt" required>
+    <button type="submit">Generálás</button>
+</form>
+
+{% if image %}
+<h3>Generált kép:</h3>
+<img src="{{ image.image_file.url }}" alt="{{ image.title }}">
+{% endif %}
+{% endblock %}

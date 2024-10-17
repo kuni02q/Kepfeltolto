@@ -8,26 +8,26 @@
         <form method="post" enctype="multipart/form-data" class="upload-form">
             {% csrf_token %}
             <div class="form-group">
-                <label for="id_image_file">Kép kiválasztása</label>
+                {{ form.image_file.label_tag }}
                 {{ form.image_file }}
             </div>
             <div class="form-group">
-                <label for="id_title">Cím</label>
+                {{ form.title.label_tag }}
                 {{ form.title }}
             </div>
             <div class="form-group">
-                <label for="id_description">Leírás</label>
+                {{ form.description.label_tag }}
                 {{ form.description }}
             </div>
             <div class="form-group">
-                <label for="id_tags">Címkék</label>
+                {{ form.tags.label_tag }}
                 {{ form.tags }}
             </div>
             <button type="submit">Feltöltés</button>
         </form>
         <div class="image-preview">
             <p>Kép előnézete:</p>
-            <img id="preview" src="#" alt="Előnézet" style="display: none;">
+            <img id="preview" src="#" alt="Előnézet" style="display: none; max-width: 300px; max-height: 300px;">
         </div>
     </div>
 </div>

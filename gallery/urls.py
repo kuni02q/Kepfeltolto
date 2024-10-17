@@ -9,7 +9,7 @@ urlpatterns = [
     path('upload/', views.image_upload, name='image_upload'),
     path('image/<int:pk>/', views.image_detail, name='image_detail'),
     path('signup/', views.signup, name='signup'),
-    path('search/', views.search, name='search'),
+    path('search/', views.search_images, name='search'),
     path('friend-search/', views.friend_search, name='friend_search'),
     path('account-settings/', views.account_settings, name='account_settings'),
     path('logout/', views.custom_logout, name='logout'),
@@ -21,5 +21,6 @@ urlpatterns = [
     path('message/<int:pk>/', views.message_detail, name='message_detail'),
     path('password_change/', auth_views.PasswordChangeView.as_view(template_name='registration/password_change_form.html'), name='password_change'),
     path('password_change/done/', auth_views.PasswordChangeDoneView.as_view(template_name='registration/password_change_done.html'), name='password_change_done'),
-
+    path('generate/', views.generate_image, name='generate_image'),
+    path('profile/edit/', views.profile_edit, name='profile_edit'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

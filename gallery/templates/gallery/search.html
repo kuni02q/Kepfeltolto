@@ -1,15 +1,16 @@
+<!-- search.html -->
+
 {% extends 'gallery/base.html' %}
 {% load static %}
 
 {% block content %}
-<h2>Keresés címkék alapján</h2>
+<h2>Kép keresése címkék alapján</h2>
+
 <form action="{% url 'search' %}" method="get" class="search-form">
-    {% csrf_token %}
-    <input type="text" name="q" placeholder="Keresés címkék alapján...">
+    <input type="text" name="q" placeholder="Címkék (pl.: tájkép, természet)" value="{{ query }}">
     <button type="submit">Keresés</button>
 </form>
 
-<!-- Keresési eredmények megjelenítése, ha vannak -->
 {% if images %}
     <h3>Keresési eredmények:</h3>
     <div class="gallery-grid">
@@ -25,33 +26,4 @@
 {% elif query %}
     <p>Nincs találat a(z) "{{ query }}" kifejezésre.</p>
 {% endif %}
-{% endblock %}
-
-{% block scripts %}
-<script src="{% static 'js/tagify.min.js' %}"></script>
-<script>
-    // Keresőmező Tagify inicializálása
-    var input = document.querySelector('.search-form input[name="q"]');
-    var tagify = new Tagify(input, {
-        whitelist: [],
-        dropdown: {
-            classname: "tags-look",
-            enabled: 0,
-            maxItems: 5,
-            position: "all",
-            closeOnSelect: false
-        }
-    });
-
-    // Címkeajánlások betöltése
-    fetch("{% url 'tag_list' %}")
-        .then(response => response.json())
-        .then(function(whitelist){
-            // A '#' jel hozzáadása a címkékhez
-            whitelist = whitelist.map(function(tag) {
-                return '#' + tag;
-            });
-            tagify.settings.whitelist = whitelist;
-        });
-</script>
 {% endblock %}

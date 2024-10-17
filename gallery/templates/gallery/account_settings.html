@@ -1,43 +1,51 @@
 {% extends 'gallery/base.html' %}
 
 {% block content %}
-<h2>Saját fiók beállításai</h2>
+<div class="profile-header">
+    <div class="profile-picture-container">
+        <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }} profilképe" class="profile-picture-large">
+    </div>
+    <div class="profile-info">
+        <h2>{{ user.username }}</h2>
+        <p>{{ user.profile.bio }}</p>
+        <a href="{% url 'profile_edit' %}" class="edit-profile-button">Profil szerkesztése</a>
+    </div>
+</div>
 
-<h3>Profiladatok</h3>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ profile_form.as_p }}
-    <button type="submit">Mentés</button>
-</form>
-
-<h3>Saját feltöltött képek</h3>
-<div class="masonry-grid">
-    {% for image in images %}
-    <div class="masonry-item">
-        <div class="image-container">
+<div class="profile-gallery">
+    {% if images %}
+        {% for image in images %}
+        <div class="gallery-item">
             <a href="{% url 'image_detail' image.pk %}">
                 <img src="{{ image.image_file.url }}" alt="{{ image.title }}">
             </a>
-            <div class="image-overlay">
-                <p>{{ image.title }}</p>
-                <form method="post" action="{% url 'image_delete' image.pk %}" onsubmit="return confirm('Biztosan törölni szeretnéd ezt a képet?');">
-                    {% csrf_token %}
-                    <button type="submit">Törlés</button>
-                </form>
-            </div>
+            {% if image.uploader == user %}
+            <form method="post" action="{% url 'image_delete' image.pk %}" onsubmit="return confirm('Biztosan törölni szeretnéd ezt a képet?');">
+                {% csrf_token %}
+                <button type="submit">Törlés</button>
+            </form>
+            {% endif %}
         </div>
-    </div>
-    {% endfor %}
-    {% if images|length == 0 %}
-    <p>Nincsenek feltöltött képeid.</p>
+        {% endfor %}
+    {% else %}
+        <p>Még nem töltöttél fel képeket.</p>
     {% endif %}
 </div>
-
-<h3>Biztonsági beállítások</h3>
-<p><a href="{% url 'password_change' %}">Jelszó módosítása</a></p>
-
 {% endblock %}
-
 {% block scripts %}
-<!-- Ha szükséges, ide helyezd a JavaScript kódokat -->
+<script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+
+<!-- Saját script -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var elem = document.querySelector('.profile-gallery');
+        var msnry = new Masonry( elem, {
+            // options
+            itemSelector: '.gallery-item',
+            columnWidth: '.gallery-item',
+            percentPosition: true,
+            gutter: 10
+        });
+    });
+</script>
 {% endblock %}

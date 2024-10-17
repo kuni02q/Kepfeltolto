@@ -14,13 +14,12 @@ class Tag(models.Model):
         return self.name
 
 class Image(models.Model):
-    title = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    image_file = models.ImageField(upload_to='images/')
-    uploaded_at = models.DateTimeField(auto_now_add=True)
     uploader = models.ForeignKey(User, on_delete=models.CASCADE)
-    categories = models.ManyToManyField('Category', blank=True)
+    image_file = models.ImageField(upload_to='images/')
+    title = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
     tags = models.ManyToManyField(Tag, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
@@ -30,7 +29,7 @@ class Profile(models.Model):
     bio = models.TextField(blank=True, null=True)
     profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
     favorite_tags = models.ManyToManyField(Tag, blank=True)
-    birth_date = models.DateField(blank=True, null=True)  # Hozzáadva
+    birth_date = models.DateField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.user.username} profilja"
@@ -43,3 +42,14 @@ class Message(models.Model):
     body = models.TextField()
     is_read = models.BooleanField(default=False)
     sent_at = models.DateTimeField(auto_now_add=True)
+
+class FavoriteImage(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    image = models.ForeignKey(Image, on_delete=models.CASCADE)
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'image')
+
+    def __str__(self):
+        return f"{self.user.username} kedveli ezt a képet: {self.image.title}"

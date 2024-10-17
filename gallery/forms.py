@@ -5,36 +5,27 @@ from .models import Image, Tag, Profile
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 import json
-
+from django.db import models
 class ImageForm(forms.ModelForm):
     tags = forms.CharField(
-        max_length=200,
         required=False,
-        widget=forms.TextInput(attrs={'name': 'tags'}),
-        help_text='Add meg a címkéket.'
+        widget=forms.TextInput(attrs={'placeholder': 'Címkék vesszővel elválasztva'}),
+        help_text='Válaszd el a címkéket vesszővel.'
     )
 
     class Meta:
         model = Image
-        fields = ['title', 'description', 'image_file', 'categories']
+        fields = ['image_file', 'title', 'description', 'tags']
 
     def save(self, commit=True):
         instance = super().save(commit=False)
+        tags_str = self.cleaned_data.get('tags', '')
+        tags_list = [tag.strip() for tag in tags_str.split(',') if tag.strip()]
         if commit:
-            instance.uploader = self.instance.uploader  # Győződj meg róla, hogy a feltöltő be van állítva
             instance.save()
-            # Címkék feldolgozása
-            tags_data = self.cleaned_data.get('tags', '[]')
-            try:
-                tags_list = json.loads(tags_data)
-            except json.JSONDecodeError:
-                tags_list = []
-
-            for tag_item in tags_list:
-                tag_name = tag_item.get('value', '').strip()
-                if tag_name:
-                    tag, created = Tag.objects.get_or_create(name=tag_name)
-                    instance.tags.add(tag)
+            for tag_name in tags_list:
+                tag, created = Tag.objects.get_or_create(name=tag_name)
+                instance.tags.add(tag)
         return instance
 
 class SignUpForm(UserCreationForm):
@@ -49,7 +40,7 @@ class SignUpForm(UserCreationForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['birth_date']# További mezők hozzáadása
+        fields = ['birth_date','profile_image', 'bio']# További mezők hozzáadása
 class ProfileUpdateForm(forms.ModelForm):
     favorite_tags = forms.ModelMultipleChoiceField(
         queryset=Tag.objects.all(),
@@ -60,4 +51,4 @@ class ProfileUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ['bio', 'profile_image', 'favorite_tags']
+        fields = ['bio', 'profile_image', 'favorite_tags']  # Győződj meg róla, hogy itt is 'profile_image' szerepel

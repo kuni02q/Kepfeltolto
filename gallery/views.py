@@ -1,5 +1,11 @@
-# gallery/views.py
+# gallery/models.py
+import base64
 
+import openai
+import requests
+import os
+import uuid
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout
@@ -8,7 +14,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import JsonResponse
 from django.contrib import messages
-from .models import Image, Tag, Profile ,Message
+from .models import Image, Tag, Profile ,Message, FavoriteImage
 from .forms import ImageForm, SignUpForm, ProfileForm ,ProfileUpdateForm
 
 def image_list(request):
@@ -23,7 +29,7 @@ def image_upload(request):
             image = form.save(commit=False)
             image.uploader = request.user
             image.save()
-            form.save_m2m()  # ManyToMany mezők mentése
+            # form.save_m2m()  # Erre nincs szükség, mert a form save() metódusa már kezeli a címkéket
             return redirect('image_detail', pk=image.pk)
     else:
         form = ImageForm()
@@ -37,18 +43,14 @@ def image_detail(request, pk):
 def image_delete(request, pk):
     image = get_object_or_404(Image, pk=pk)
 
-    # Ellenőrizzük, hogy a bejelentkezett felhasználó a kép feltöltője-e
     if image.uploader != request.user:
-        # Ha nem, visszairányítjuk a felhasználót egy hibaoldalra vagy a főoldalra
         return redirect('image_list')
 
     if request.method == 'POST':
         image.delete()
         messages.success(request, 'A kép sikeresen törölve lett.')
-        # Visszairányítjuk a felhasználót a saját fiók oldalára
         return redirect('account_settings')
 
-    # Ha valaki GET kérést küld erre az URL-re, visszairányítjuk
     return redirect('account_settings')
 
 def signup(request):
@@ -90,16 +92,49 @@ def friend_search(request):
         users = users.filter(Q(username__icontains=query) | Q(first_name__icontains=query) | Q(last_name__icontains=query))
     return render(request, 'gallery/friend_search.html', {'users': users, 'query': query})
 
-def search(request):
+def search_images(request):
     query = request.GET.get('q', '')
-    images = None
+    images = Image.objects.all()
     if query:
-        # A '#' jel eltávolítása a keresési feltételből
-        tag_name = query.lstrip('#')
-        images = Image.objects.filter(tags__name__icontains=tag_name).distinct()
+        tag_names = [tag.strip() for tag in query.split(',') if tag.strip()]
+        images = images.filter(tags__name__in=tag_names).distinct()
     return render(request, 'gallery/search.html', {'images': images, 'query': query})
 
+def generate_image(request):
+    if request.method == 'POST':
+        prompt = request.POST.get('prompt')
+        openai.api_key = settings.OPENAI_API_KEY
 
+        try:
+            # Kép generálása az OpenAI API-val
+            response = openai.Image.create(
+                prompt=prompt,
+                n=1,
+                size='512x512',
+                response_format='b64_json'  # Új paraméter
+            )
+            image_data = base64.b64decode(response['data'][0]['b64_json'])
+
+            filename = f"{uuid.uuid4()}.png"
+            filepath = os.path.join(settings.MEDIA_ROOT, 'generated', filename)
+
+            os.makedirs(os.path.dirname(filepath), exist_ok=True)
+
+            with open(filepath, 'wb') as f:
+                f.write(image_data)
+
+            new_image = Image.objects.create(
+                title=prompt,
+                image_file=f'generated/{filename}',
+                uploaded_by=request.user
+            )
+
+            return render(request, 'gallery/generate_image.html', {'image': new_image})
+
+        except Exception as e:
+            return render(request, 'gallery/generate_image.html', {'error': str(e)})
+
+    return render(request, 'gallery/generate_image.html')
 def custom_logout(request):
     logout(request)
     return redirect('/login/')
@@ -120,3 +155,25 @@ def message_detail(request, pk):
         message.is_read = True
         message.save()
     return render(request, 'gallery/message_detail.html', {'message': message})
+
+@login_required
+def add_to_favorites(request, image_id):
+    image = Image.objects.get(pk=image_id)
+    FavoriteImage.objects.get_or_create(user=request.user, image=image)
+    return redirect('image_detail', pk=image_id)
+
+@login_required
+def remove_from_favorites(request, image_id):
+    image = Image.objects.get(pk=image_id)
+    FavoriteImage.objects.filter(user=request.user, image=image).delete()
+    return redirect('image_detail', pk=image_id)
+@login_required
+def profile_edit(request):
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        if form.is_valid():
+            form.save()
+            return redirect('account_settings')
+    else:
+        form = ProfileForm(instance=request.user.profile)
+    return render(request, 'gallery/profile_edit.html', {'form': form})
