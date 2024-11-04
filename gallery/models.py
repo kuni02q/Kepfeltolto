@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
+import base64
 
+import openai
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
@@ -27,7 +29,7 @@ class Image(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     bio = models.TextField(blank=True, null=True)
-    profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True)
+    profile_image = models.ImageField(upload_to='profile/', blank=True, null=True)
     favorite_tags = models.ManyToManyField(Tag, blank=True)
     birth_date = models.DateField(blank=True, null=True)
 

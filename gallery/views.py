@@ -1,4 +1,3 @@
-# gallery/models.py
 import base64
 
 import openai
@@ -15,7 +14,9 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.contrib import messages
 from .models import Image, Tag, Profile ,Message, FavoriteImage
-from .forms import ImageForm, SignUpForm, ProfileForm ,ProfileUpdateForm
+from .forms import ImageForm, SignUpForm, ProfileForm ,ProfileUpdateForm,SearchForm
+
+
 
 def image_list(request):
     images = Image.objects.all().order_by('-uploaded_at')
@@ -29,16 +30,17 @@ def image_upload(request):
             image = form.save(commit=False)
             image.uploader = request.user
             image.save()
-            # form.save_m2m()  # Erre nincs szükség, mert a form save() metódusa már kezeli a címkéket
+            form.save_m2m()  # Mivel ManyToMany mezőt használunk, szükséges a form.save_m2m()
             return redirect('image_detail', pk=image.pk)
     else:
         form = ImageForm()
     return render(request, 'gallery/image_upload.html', {'form': form})
 
+
+
 def image_detail(request, pk):
     image = get_object_or_404(Image, pk=pk)
     return render(request, 'gallery/image_detail.html', {'image': image})
-
 @login_required
 def image_delete(request, pk):
     image = get_object_or_404(Image, pk=pk)
@@ -58,8 +60,8 @@ def signup(request):
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # Létrehozzuk a felhasználó profilját
-            Profile.objects.create(user=user)
+            # Profil létrehozása, ha nem létezik
+            profile, created = Profile.objects.get_or_create(user=user)
             login(request, user)
             return redirect('image_list')
     else:
@@ -93,13 +95,22 @@ def friend_search(request):
     return render(request, 'gallery/friend_search.html', {'users': users, 'query': query})
 
 def search_images(request):
-    query = request.GET.get('q', '')
-    images = Image.objects.all()
-    if query:
-        tag_names = [tag.strip() for tag in query.split(',') if tag.strip()]
-        images = images.filter(tags__name__in=tag_names).distinct()
-    return render(request, 'gallery/search.html', {'images': images, 'query': query})
+    if request.method == 'GET':
+        form = SearchForm(request.GET)
+        images = Image.objects.all()
+        if form.is_valid():
+            selected_tags = form.cleaned_data.get('tags')
+            if selected_tags:
+                images = images.filter(tags__in=selected_tags).distinct()
+            else:
+                images = Image.objects.none()
+        else:
+            images = Image.objects.none()
+    else:
+        form = SearchForm()
+        images = Image.objects.none()
 
+    return render(request, 'gallery/search.html', {'images': images, 'form': form})
 def generate_image(request):
     if request.method == 'POST':
         prompt = request.POST.get('prompt')
@@ -139,8 +150,11 @@ def custom_logout(request):
     logout(request)
     return redirect('/login/')
 def tag_list(request):
-    tags = list(Tag.objects.values_list('name', flat=True))
-    return JsonResponse(tags, safe=False)
+    q = request.GET.get('q', '')
+    tags = Tag.objects.filter(name__icontains=q).order_by('name')
+    tags_json = [{'id': tag.id, 'name': tag.name} for tag in tags]
+    return JsonResponse(tags_json, safe=False)
+
 def help_page(request):
     return render(request, 'gallery/help_page.html')
 @login_required

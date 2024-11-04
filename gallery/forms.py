@@ -7,26 +7,32 @@ from django.contrib.auth.models import User
 import json
 from django.db import models
 class ImageForm(forms.ModelForm):
-    tags = forms.CharField(
+    tags = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.all().order_by('name'),  # Itt rendezünk ABC sorrendbe
+        widget=forms.SelectMultiple(attrs={
+            'class': 'select2-multiple',
+            'placeholder': 'Válassz címkéket'
+        }),
         required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'Címkék vesszővel elválasztva'}),
-        help_text='Válaszd el a címkéket vesszővel.'
+        help_text='Válaszd ki a címkéket, amelyek legjobban leírják a képet.'
     )
 
     class Meta:
         model = Image
         fields = ['image_file', 'title', 'description', 'tags']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 4}),
+        }
+        help_texts = {
+            'image_file': 'Válaszd ki a feltölteni kívánt képfájlt.',
+            'title': 'Adj meg egy címet a képnek.',
+            'description': 'Írj egy rövid leírást a képről.',
+        }
 
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        tags_str = self.cleaned_data.get('tags', '')
-        tags_list = [tag.strip() for tag in tags_str.split(',') if tag.strip()]
-        if commit:
-            instance.save()
-            for tag_name in tags_list:
-                tag, created = Tag.objects.get_or_create(name=tag_name)
-                instance.tags.add(tag)
-        return instance
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['tags'].queryset = Tag.objects.all().order_by('name')
+
 
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -52,3 +58,15 @@ class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ['bio', 'profile_image', 'favorite_tags']  # Győződj meg róla, hogy itt is 'profile_image' szerepel
+
+class SearchForm(forms.Form):
+    tags = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.all(),
+        widget=forms.SelectMultiple(attrs={'class': 'select2-multiple'}),
+        required=False,
+        label='Címkék'
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['tags'].queryset = Tag.objects.all()

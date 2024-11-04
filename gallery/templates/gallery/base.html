@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <title>Best Gallery</title>
     {% load static %}
+     <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Saját CSS fájl -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
-<link rel="stylesheet" type="text/css" href="{% static 'css/tagify.css' %}">
+<!-- <link rel="stylesheet" type="text/css" href="{% static 'css/tagify.css' %}">-->
 </head>
 <body>
 
@@ -48,8 +51,15 @@
     <footer>
         <p>&copy; {{ current_year|default:"2024" }} Best Gallery. Minden jog fenntartva.</p>
     </footer>
+    <!-- jQuery (szükséges a Select2-höz) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- Szükség esetén a Select2 magyar nyelvi fájlja -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/i18n/hu.min.js"></script>
+
 {% block scripts %}
-<script src="{% static 'js/tagify.js' %}"></script>
+<!--<script src="{% static 'js/tagify.js' %}"></script>-->
 <script>
     // Keresőmező Tagify inicializálása
     var input = document.querySelector('.search-form input[name="q"]');

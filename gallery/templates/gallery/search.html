@@ -1,13 +1,11 @@
-<!-- search.html -->
-
 {% extends 'gallery/base.html' %}
 {% load static %}
 
 {% block content %}
 <h2>Kép keresése címkék alapján</h2>
 
-<form action="{% url 'search' %}" method="get" class="search-form">
-    <input type="text" name="q" placeholder="Címkék (pl.: tájkép, természet)" value="{{ query }}">
+<form method="get" class="search-form">
+    {{ form.as_p }}
     <button type="submit">Keresés</button>
 </form>
 
@@ -23,7 +21,19 @@
         </div>
         {% endfor %}
     </div>
-{% elif query %}
-    <p>Nincs találat a(z) "{{ query }}" kifejezésre.</p>
+{% else %}
+    <p>Nincs találat a megadott címkékre.</p>
 {% endif %}
+{% endblock %}
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        $('.select2-multiple').select2({
+            placeholder: "Válassz címkéket",
+            allowClear: true,
+            width: '100%',
+            language: 'hu'
+        });
+    });
+</script>
 {% endblock %}

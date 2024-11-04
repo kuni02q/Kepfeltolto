@@ -308,48 +308,93 @@ footer {
 
 /* Feltöltési oldal stílusai */
 .upload-container {
-    max-width: 600px;
-    margin: 0 auto;
+    max-width: 800px;
+    margin: 20px auto;
     padding: 20px;
-    text-align: center;
+    text-align: left;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.upload-container .form-group {
+.upload-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.upload-container p {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #666;
+}
+
+.upload-form-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.upload-form {
+    flex: 1 1 300px;
+    min-width: 280px;
+}
+
+.form-group {
     margin-bottom: 15px;
 }
 
-.upload-container label {
-    display: block;
+.form-group label {
     font-weight: bold;
     margin-bottom: 5px;
-    text-align: left;
+    display: block;
 }
 
-.upload-container input,
-.upload-container textarea,
-.upload-container select {
+.form-group input,
+.form-group textarea,
+.form-group select {
     width: 100%;
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    text-align: left;
 }
 
-.upload-container button {
+.form-group .form-text {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.error {
+    color: red;
+    font-size: 0.9em;
+}
+
+.upload-form button {
     background-color: #E85A4F;
     color: #fff;
     border: none;
-    padding: 10px 20px;
+    padding: 12px 24px;
     cursor: pointer;
-    margin: 0 auto;
-    display: block;
     border-radius: 4px;
+    font-size: 1em;
 }
 
-.upload-container button:hover {
+.upload-form button:hover {
     background-color: #E98074;
 }
 
+.image-preview {
+    flex: 1 1 300px;
+    min-width: 280px;
+    text-align: center;
+}
+
+.image-preview img {
+    max-width: 100%;
+    height: auto;
+    max-height: 300px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
 /* Üzenetek listája */
 .message-list {
     list-style: none;
@@ -476,4 +521,13 @@ footer {
 .profile-gallery .gallery-item button {
     margin-top: 5px;
     width: 100%;
+}
+.tag {
+    display: inline-block;
+    background-color: #EAE7DC;
+    color: #8E8D8A;
+    padding: 5px 10px;
+    margin: 2px;
+    border-radius: 4px;
+    font-size: 0.8em;
 }

@@ -1,9 +1,15 @@
 {% extends 'gallery/base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="profile-header">
     <div class="profile-picture-container">
-        <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }} profilképe" class="profile-picture-large">
+        {% if user.profile.profile_image %}
+            <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }} profilképe" class="profile-picture-large">
+        {% else %}
+            <!-- Alapértelmezett profilkép -->
+            <img src="{% static 'images/default_profile.png' %}" alt="Alapértelmezett profilkép" class="profile-picture-large">
+        {% endif %}
     </div>
     <div class="profile-info">
         <h2>{{ user.username }}</h2>
@@ -32,6 +38,7 @@
     {% endif %}
 </div>
 {% endblock %}
+
 {% block scripts %}
 <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
 
