@@ -7,8 +7,26 @@
      <!-- Select2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <!-- Saját CSS fájl -->
-    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+    <link id="theme" rel="stylesheet" type="text/css" href="{% static 'css/light.css' %}">
 <!-- <link rel="stylesheet" type="text/css" href="{% static 'css/tagify.css' %}">-->
+
+    <script>            
+        function switchTheme() {
+            const theme = document.getElementById('theme');
+            const lightTheme = "{% static 'css/light.css' %}";
+            const darkTheme = "{% static 'css/dark.css' %}";
+
+            if (theme.getAttribute('href') === lightTheme) {
+                theme.setAttribute('href', darkTheme);
+                document.getElementById("switchTheme").innerHTML="Világos"
+                localStorage.setItem('theme', 'dark');  // Mentés localStorage-be
+            } else {
+                theme.setAttribute('href', lightTheme);
+                localStorage.setItem('theme', 'light'); // Mentés localStorage-be
+                document.getElementById("switchTheme").innerHTML="Sötét"
+            }
+        }
+    </script>
 </head>
 <body>
 
@@ -40,6 +58,7 @@
                         <li><a href="{% url 'signup' %}">Regisztráció</a></li>
                         <li><a href="{% url 'help_page' %}">Segítség</a></li>
                     {% endif %}
+                    <li><a id="switchTheme" onclick="switchTheme()">Sötét</a></li>
                 </ul>
             </nav>
         </div>
@@ -86,6 +105,19 @@
                 tagify.settings.whitelist = whitelist;
             });
     }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const savedTheme = localStorage.getItem('theme');
+        const theme = document.getElementById('theme');
+        
+        // Alapértelmezett beállítás light.css, ha nincs mentett téma
+        if (savedTheme === 'dark') {
+            theme.setAttribute('href', "{% static 'css/dark.css' %}");
+        } else {
+            theme.setAttribute('href', "{% static 'css/light.css' %}");
+        }
+    });
+    
 </script>
 {% endblock %}
 </body>
