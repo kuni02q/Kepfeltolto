@@ -127,7 +127,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-OPENAI_API_KEY = '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'
+
 #LOGOUT_REDIRECT_URL = 'image_list'
 LOGIN_URL = '/login/'  # Ha szükséges
 LOGIN_REDIRECT_URL = 'image_list'
