@@ -127,7 +127,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 #LOGOUT_REDIRECT_URL = 'image_list'
 LOGIN_URL = '/login/'  # Ha szükséges
 LOGIN_REDIRECT_URL = 'image_list'
