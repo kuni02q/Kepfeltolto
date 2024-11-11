@@ -10,12 +10,12 @@
     <link id="theme" rel="stylesheet" type="text/css" href="{% static 'css/light.css' %}">
 <!-- <link rel="stylesheet" type="text/css" href="{% static 'css/tagify.css' %}">-->
 
-    <script>            
+    <script>
         function switchTheme() {
             const theme = document.getElementById('theme');
             const lightTheme = "{% static 'css/light.css' %}";
             const darkTheme = "{% static 'css/dark.css' %}";
-
+        
             if (theme.getAttribute('href') === lightTheme) {
                 theme.setAttribute('href', darkTheme);
                 document.getElementById("switchTheme").innerHTML="Világos"
@@ -26,6 +26,18 @@
                 document.getElementById("switchTheme").innerHTML="Sötét"
             }
         }
+        
+        document.addEventListener("DOMContentLoaded", function() {
+            const savedTheme = localStorage.getItem('theme');
+            const theme = document.getElementById('theme');
+            
+            // Alapértelmezett beállítás light.css, ha nincs mentett téma
+            if (savedTheme === 'dark') {
+                theme.setAttribute('href', "{% static 'css/dark.css' %}");
+            } else {
+                theme.setAttribute('href', "{% static 'css/light.css' %}");
+            }
+        });
     </script>
 </head>
 <body>
@@ -105,18 +117,6 @@
                 tagify.settings.whitelist = whitelist;
             });
     }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        const savedTheme = localStorage.getItem('theme');
-        const theme = document.getElementById('theme');
-        
-        // Alapértelmezett beállítás light.css, ha nincs mentett téma
-        if (savedTheme === 'dark') {
-            theme.setAttribute('href', "{% static 'css/dark.css' %}");
-        } else {
-            theme.setAttribute('href', "{% static 'css/light.css' %}");
-        }
-    });
     
 </script>
 {% endblock %}
