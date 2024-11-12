@@ -5,37 +5,34 @@ from .models import Image, Tag, Profile
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 import json
-
+from django.db import models
 class ImageForm(forms.ModelForm):
-    tags = forms.CharField(
-        max_length=200,
+    tags = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.all().order_by('name'),  # Itt rendezünk ABC sorrendbe
+        widget=forms.SelectMultiple(attrs={
+            'class': 'select2-multiple',
+            'placeholder': 'Válassz címkéket'
+        }),
         required=False,
-        widget=forms.TextInput(attrs={'name': 'tags'}),
-        help_text='Add meg a címkéket.'
+        help_text='Válaszd ki a címkéket, amelyek legjobban leírják a képet.'
     )
 
     class Meta:
         model = Image
-        fields = ['title', 'description', 'image_file', 'categories']
+        fields = ['image_file', 'title', 'description', 'tags']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 4}),
+        }
+        help_texts = {
+            'image_file': 'Válaszd ki a feltölteni kívánt képfájlt.',
+            'title': 'Adj meg egy címet a képnek.',
+            'description': 'Írj egy rövid leírást a képről.',
+        }
 
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        if commit:
-            instance.uploader = self.instance.uploader  # Győződj meg róla, hogy a feltöltő be van állítva
-            instance.save()
-            # Címkék feldolgozása
-            tags_data = self.cleaned_data.get('tags', '[]')
-            try:
-                tags_list = json.loads(tags_data)
-            except json.JSONDecodeError:
-                tags_list = []
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['tags'].queryset = Tag.objects.all().order_by('name')
 
-            for tag_item in tags_list:
-                tag_name = tag_item.get('value', '').strip()
-                if tag_name:
-                    tag, created = Tag.objects.get_or_create(name=tag_name)
-                    instance.tags.add(tag)
-        return instance
 
 class SignUpForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -49,7 +46,7 @@ class SignUpForm(UserCreationForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['birth_date']# További mezők hozzáadása
+        fields = ['birth_date','profile_image', 'bio']# További mezők hozzáadása
 class ProfileUpdateForm(forms.ModelForm):
     favorite_tags = forms.ModelMultipleChoiceField(
         queryset=Tag.objects.all(),
@@ -60,4 +57,16 @@ class ProfileUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ['bio', 'profile_image', 'favorite_tags']
+        fields = ['bio', 'profile_image', 'favorite_tags']  # Győződj meg róla, hogy itt is 'profile_image' szerepel
+
+class SearchForm(forms.Form):
+    tags = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.all(),
+        widget=forms.SelectMultiple(attrs={'class': 'select2-multiple'}),
+        required=False,
+        label='Címkék'
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['tags'].queryset = Tag.objects.all()

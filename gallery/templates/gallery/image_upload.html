@@ -4,30 +4,27 @@
 {% block content %}
 <div class="upload-container">
     <h2>Új kép feltöltése</h2>
+    <p>Kérjük, töltsd ki az alábbi űrlapot a kép feltöltéséhez. Adj meg egy címet és egy rövid leírást, valamint válaszd ki a címkéket, amelyek legjobban leírják a képet.</p>
     <div class="upload-form-container">
         <form method="post" enctype="multipart/form-data" class="upload-form">
             {% csrf_token %}
-            <div class="form-group">
-                <label for="id_image_file">Kép kiválasztása</label>
-                {{ form.image_file }}
-            </div>
-            <div class="form-group">
-                <label for="id_title">Cím</label>
-                {{ form.title }}
-            </div>
-            <div class="form-group">
-                <label for="id_description">Leírás</label>
-                {{ form.description }}
-            </div>
-            <div class="form-group">
-                <label for="id_tags">Címkék</label>
-                {{ form.tags }}
-            </div>
+            {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <div class="error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
             <button type="submit">Feltöltés</button>
         </form>
         <div class="image-preview">
             <p>Kép előnézete:</p>
-            <img id="preview" src="#" alt="Előnézet" style="display: none;">
+            <img id="preview" src="#" alt="Előnézet" style="display: none; max-width: 100%; max-height: 300px;">
         </div>
     </div>
 </div>
@@ -35,17 +32,49 @@
 
 {% block scripts %}
 <script>
-    // Kép előnézet megjelenítése
-    document.getElementById('id_image_file').onchange = function (e) {
-        var preview = document.getElementById('preview');
-        var file = e.target.files[0];
-        if (file) {
-            preview.src = URL.createObjectURL(file);
-            preview.style.display = 'block';
-        } else {
-            preview.src = '#';
-            preview.style.display = 'none';
-        }
-    };
+    $(document).ready(function() {
+        // Kép előnézet megjelenítése jQuery-vel
+        $('#id_image_file').change(function(e) {
+            var preview = $('#preview');
+            var file = e.target.files[0];
+            if (file) {
+                preview.attr('src', URL.createObjectURL(file));
+                preview.show();
+            } else {
+                preview.attr('src', '#');
+                preview.hide();
+            }
+        });
+
+        // Select2 inicializálása a tags mezőre AJAX betöltéssel
+        $('.select2-multiple').select2({
+            placeholder: "Válassz címkéket",
+            allowClear: true,
+            width: '100%',
+            language: 'hu',
+            ajax: {
+                url: "{% url 'tag_list' %}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term  // Keresési kifejezés
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: $.map(data, function (tag) {
+                            return {
+                                id: tag.id,
+                                text: tag.name
+                            };
+                        })
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1,
+        });
+    });
 </script>
 {% endblock %}

@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block content %}
+
 <h2>Legújabb képek</h2>
 <div class="gallery-grid">
     {% for image in images %}
@@ -26,8 +27,9 @@
         // Masonry inicializálása
         msnry = new Masonry( grid, {
             itemSelector: '.gallery-item',
+            columnWidth: '.gallery-item',
             percentPosition: true,
-            gutter: 10
+            gutter: 20
         });
     });
 </script>

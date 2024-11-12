@@ -1,0 +1,22 @@
+{% extends 'gallery/base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Profil szerkesztése</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div>
+        <label for="id_birth_date">Születési dátum:</label>
+        {{ form.birth_date }}
+    </div>
+    <div>
+        <label for="id_profile_image">Profilkép:</label>
+        {{ form.profile_image }}  <!-- Győződj meg róla, hogy 'profile_image' szerepel -->
+    </div>
+    <div>
+        <label for="id_bio">Bemutatkozás:</label>
+        {{ form.bio }}
+    </div>
+    <button type="submit">Mentés</button>
+</form>
+{% endblock %}

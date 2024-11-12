@@ -1,19 +1,35 @@
 {% extends 'gallery/base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="image-detail">
     <h2>{{ image.title }}</h2>
     <img src="{{ image.image_file.url }}" alt="{{ image.title }}">
     <p>{{ image.description }}</p>
-    <p>Feltöltő: {{ image.uploader.username }}</p>
-    <p>Feltöltve: {{ image.uploaded_at }}</p>
-    <p>Címkék:
-        {% for tag in image.tags.all %}
-            #{{ tag.name }}{% if not forloop.last %}, {% endif %}
-        {% empty %}
-            Nincsenek címkék.
-        {% endfor %}
-    </p>
-    <p><a href="{% url 'image_list' %}">Vissza a galériához</a></p>
+    {% if image.tags.all %}
+        <p>Címkék:
+            {% for tag in image.tags.all %}
+                <span class="tag">{{ tag.name }}</span>
+            {% endfor %}
+        </p>
+    {% else %}
+        <p>Nincsenek címkék ehhez a képhez.</p>
+    {% endif %}
+
+    <!-- Like és Dislike gombok -->
+    <div class="like-dislike-buttons">
+        <form action="{% url 'like_image' image.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="like-btn">
+                👍 Tetszik ({{ image.total_likes }})
+            </button>
+        </form>
+        <form action="{% url 'dislike_image' image.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="dislike-btn">
+                👎 Nem tetszik ({{ image.total_dislikes }})
+            </button>
+        </form>
+    </div>
 </div>
 {% endblock %}
