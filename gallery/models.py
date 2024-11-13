@@ -20,7 +20,9 @@ class Tag(models.Model):
 
 
 class Image(models.Model):
-    uploader = models.ForeignKey(User, on_delete=models.CASCADE)
+    uploader = models.ForeignKey(
+        User, related_name="uploaded_images", on_delete=models.CASCADE
+    )
     image_file = models.ImageField(upload_to="images/")
     title = models.CharField(max_length=100)
     description = models.TextField(blank=True)
@@ -37,6 +39,16 @@ class Image(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Comment(models.Model):
+    image = models.ForeignKey(Image, related_name="comments", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.content[:20]}"
 
 
 class Profile(models.Model):

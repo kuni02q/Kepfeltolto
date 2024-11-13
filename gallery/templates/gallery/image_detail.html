@@ -6,6 +6,14 @@
     <h2>{{ image.title }}</h2>
     <img src="{{ image.image_file.url }}" alt="{{ image.title }}">
     <p>{{ image.description }}</p>
+
+    <!-- Feltöltő megjelenítése -->
+    <p>Feltöltötte: 
+        <a href="{% url 'profile' image.uploader.username %}">
+            {{ image.uploader.username }}
+        </a>
+    </p>
+
     {% if image.tags.all %}
         <p>Címkék:
             {% for tag in image.tags.all %}
@@ -31,5 +39,39 @@
             </button>
         </form>
     </div>
+
+    <!-- Kommentek megjelenítése -->
+    <div class="comments-section">
+        <h3>Hozzászólások</h3>
+        {% for comment in comments %}
+            <div class="comment">
+                <a href="{% url 'profile' comment.user.username %}">
+                {% if comment.user.profile.profile_image %}
+                    <img src="{{ comment.user.profile.profile_image.url }}" alt="{{ user.username }} profilképe" class="profile-picture">
+                {% else %}
+                    <img src="{% static 'images/default_profile.png' %}" alt="Alapértelmezett profilkép" class="profile-picture">
+                {% endif %}
+                <p><strong>{{ comment.user.username }}</strong> - {{ comment.created_at }}</p>
+                </a>
+            <p>{{ comment.content }}</p>
+            </div>
+        {% empty %}
+            <p>Nincsenek hozzászólások.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Új hozzászólás űrlapja -->
+    {% if user.is_authenticated %}
+        <h4>Új hozzászólás</h4>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Hozzászólás beküldése</button>
+        </form>
+    {% else %}
+        <p>Kérjük, <a href="{% url 'login' %}">jelentkezz be</a>, hogy hozzászólhass.</p>
+    {% endif %}
+
+
 </div>
 {% endblock %}
