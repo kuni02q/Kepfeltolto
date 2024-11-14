@@ -1,0 +1,36 @@
+{% extends 'gallery/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="profile-header">
+    <div class="profile-picture-container">
+        {% if profile_user.profile.profile_image %}
+            <img src="{{ profile_user.profile.profile_image.url }}" alt="{{ profile_user.username }} profilképe" class="profile-picture-large">
+        {% else %}
+            <!-- Alapértelmezett profilkép -->
+            <img src="{% static 'images/default_profile.png' %}" alt="Alapértelmezett profilkép" class="profile-picture-large">
+        {% endif %}
+    </div>
+    <div class="profile-info">
+        <h2>{{ profile_user.username }}</h2>
+        <p>{{ user.profile.bio }}</p>
+    </div>
+</div>
+
+
+<h3>Feltöltött képek:</h3>
+<div class="profile-gallery">
+    {% if images %}
+        {% for image in images %}
+        <div class="gallery-item">
+            <a href="{% url 'image_detail' image.pk %}">
+                <img src="{{ image.image_file.url }}" alt="{{ image.title }}">
+            </a>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>Még nem töltött fel képeket.</p>
+    {% endif %}
+</div>
+{% endblock %}

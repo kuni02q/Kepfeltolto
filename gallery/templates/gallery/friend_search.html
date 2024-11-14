@@ -1,4 +1,5 @@
 {% extends 'gallery/base.html' %}
+{% load static %}
 
 {% block content %}
 <h2>Barát keresés</h2>
@@ -8,12 +9,19 @@
 </form>
 
 {% if users %}
-    <ul>
+    <div class="profiles-grid">
         {% for user in users %}
-            <li>{{ user.username }} ({{ user.first_name }} {{ user.last_name }})</li>
-        {% empty %}
-            <p>Nincs találat.</p>
+        <div class="profiles-item">
+            <a href="{% url 'profile' user.username %}">
+                {% if user.profile.profile_image %}
+                    <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }} profilképe" class="profile-picture">
+                {% else %}
+                    <img src="{% static 'images/default_profile.png' %}" alt="Alapértelmezett profilkép" class="profile-picture">
+                {% endif %}
+                <p>{{ user.username }} ({{ user.first_name }} {{ user.last_name }})</p>
+            </a>
+        </div>
         {% endfor %}
-    </ul>
+    </div>
 {% endif %}
 {% endblock %}

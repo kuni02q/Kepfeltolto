@@ -14,8 +14,15 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import ImageForm, ProfileForm, ProfileUpdateForm, SearchForm, SignUpForm
-from .models import FavoriteImage, Image, Message, Profile, Tag
+from .forms import (
+    CommentForm,
+    ImageForm,
+    ProfileForm,
+    ProfileUpdateForm,
+    SearchForm,
+    SignUpForm,
+)
+from .models import Comment, FavoriteImage, Image, Message, Profile, Tag
 
 
 def image_list(request):
@@ -40,7 +47,28 @@ def image_upload(request):
 
 def image_detail(request, pk):
     image = get_object_or_404(Image, pk=pk)
-    return render(request, "gallery/image_detail.html", {"image": image})
+    comments = image.comments.all()
+
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.image = image
+            comment.user = request.user
+            comment.save()
+            return redirect("image_detail", pk=image.id)
+    else:
+        form = CommentForm()
+
+    return render(
+        request,
+        "gallery/image_detail.html",
+        {
+            "image": image,
+            "comments": comments,
+            "form": form,
+        },
+    )
 
 
 @login_required
@@ -131,6 +159,9 @@ def friend_search(request):
             | Q(first_name__icontains=query)
             | Q(last_name__icontains=query)
         )
+        # Ha azt akarjuk, hogy ha üresen hagyjuk a keresési mezőt, ne dobjon egyetlen felhasználót se, akkor el kell tüntetni a kommentet:
+    """else:
+        users = User.objects.none()  # Üres queryset, ha nincs keresési feltétel"""
     return render(
         request, "gallery/friend_search.html", {"users": users, "query": query}
     )
@@ -248,3 +279,11 @@ def profile_edit(request):
     else:
         form = ProfileForm(instance=request.user.profile)
     return render(request, "gallery/profile_edit.html", {"form": form})
+
+
+def profile(request, username):
+    user = get_object_or_404(User, username=username)
+    images = user.uploaded_images.all()
+    return render(
+        request, "gallery/users_profile.html", {"profile_user": user, "images": images}
+    )

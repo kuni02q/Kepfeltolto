@@ -42,4 +42,5 @@ urlpatterns = [
     path("profile/edit/", views.profile_edit, name="profile_edit"),
     path("image/<int:image_id>/like/", views.like_image, name="like_image"),
     path("image/<int:image_id>/dislike/", views.dislike_image, name="dislike_image"),
+    path("profile/<str:username>/", views.profile, name="profile"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

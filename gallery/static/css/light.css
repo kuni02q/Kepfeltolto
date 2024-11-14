@@ -7,6 +7,10 @@ body {
     background-color: #EAE7DC;
 }
 
+a{
+    text-decoration: none;
+}
+
 /* Konténer */
 .container {
     width: 100%;
@@ -535,4 +539,26 @@ footer {
 
 .like-dislike-buttons {
     display: flex;
+}
+
+.comments-section{
+    background-color: red;
+}
+
+.profiles-grid{
+    margin: 0 auto;
+}
+
+.profiles-item{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-picture{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
 }
