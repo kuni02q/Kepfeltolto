@@ -1,0 +1,10 @@
+{% extends 'gallery/base.html' %}
+
+{% block content %}
+<h2>{{ message.subject }}</h2>
+<p><strong>Feladó:</strong> <a href="{% url 'profile' message.sender.username %}"> {{ message.sender.username }}</a></p>
+<p><strong>Küldve:</strong> {{ message.sent_at }}</p>
+<p>{{ message.body}}</p>
+
+<a href="{% url 'inbox' %}">Vissza az üzenetekhez</a>
+{% endblock %}

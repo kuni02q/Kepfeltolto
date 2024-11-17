@@ -22,7 +22,7 @@ urlpatterns = [
         name="login",
     ),
     path("help/", views.help_page, name="help_page"),
-    path("inbox/", views.inbox, name="inbox"),
+    path("inbox/", views.inbox_view, name="inbox"),
     path("message/<int:pk>/", views.message_detail, name="message_detail"),
     path(
         "password_change/",

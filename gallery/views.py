@@ -48,6 +48,7 @@ def image_upload(request):
 def image_detail(request, pk):
     image = get_object_or_404(Image, pk=pk)
     comments = image.comments.all()
+    form = CommentForm()
 
     if request.method == "POST":
         form = CommentForm(request.POST)
@@ -56,9 +57,19 @@ def image_detail(request, pk):
             comment.image = image
             comment.user = request.user
             comment.save()
-            return redirect("image_detail", pk=image.id)
-    else:
-        form = CommentForm()
+            # Üzenet létrehozása a feltöltőnek
+            if (
+                image.uploader != request.user
+            ):  # Csak akkor küld értesítést, ha nem a feltöltő kommentel
+                Message.objects.create(
+                    sender=request.user,
+                    recipient=image.uploader,
+                    title=image.title,
+                    subject="Új hozzászólás a képhez",
+                    body=f"{request.user.username}hozzászólt a képhez: {image.title}",
+                )
+
+        return redirect("image_detail", pk=image.id)
 
     return render(
         request,
@@ -80,6 +91,13 @@ def like_image(request, image_id):
         image.dislikes.remove(request.user)
     if request.user not in image.likes.all():
         image.likes.add(request.user)
+        if image.uploader != request.user:
+            Message.objects.create(
+                sender=request.user,
+                recipient=image.uploader,
+                subject="Új 'Tetszik' reakció a képedre",
+                body=f"{request.user.username} kedvelte a képedet: {image.title}. ",
+            )
     else:
         image.likes.remove(request.user)
     return redirect("image_detail", pk=image_id)
@@ -94,6 +112,14 @@ def dislike_image(request, image_id):
         image.likes.remove(request.user)
     if request.user not in image.dislikes.all():
         image.dislikes.add(request.user)
+        # Üzenet küldése a feltöltőnek, ha másik felhasználó nem kedvelte a képet
+        if image.uploader != request.user:
+            Message.objects.create(
+                sender=request.user,
+                recipient=image.uploader,
+                subject="Új 'Nem tetszik' reakció a képedre",
+                body=f"{request.user.username} nem kedvelte a képedet: {image.title}. ",
+            )
     else:
         image.dislikes.remove(request.user)
     return redirect("image_detail", pk=image_id)
@@ -240,22 +266,6 @@ def help_page(request):
 
 
 @login_required
-def inbox(request):
-    messages = Message.objects.filter(recipient=request.user).order_by("-sent_at")
-    return render(request, "gallery/inbox.html", {"messages": messages})
-
-
-@login_required
-def message_detail(request, pk):
-    message = get_object_or_404(Message, pk=pk, recipient=request.user)
-    # Jelöljük az üzenetet olvasottként
-    if not message.is_read:
-        message.is_read = True
-        message.save()
-    return render(request, "gallery/message_detail.html", {"message": message})
-
-
-@login_required
 def add_to_favorites(request, image_id):
     image = Image.objects.get(pk=image_id)
     FavoriteImage.objects.get_or_create(user=request.user, image=image)
@@ -287,3 +297,34 @@ def profile(request, username):
     return render(
         request, "gallery/users_profile.html", {"profile_user": user, "images": images}
     )
+
+
+def add_comment(request, image_id):
+    image = get_object_or_404(Image, id=image_id)
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.image = image
+            comment.user = request.user
+            comment.save()
+
+    else:
+        form = CommentForm()
+    return render(request, "gallery/image_detail.html", {"form": form, "image": image})
+
+
+@login_required
+def inbox_view(request):
+    messages = Message.objects.filter(recipient=request.user).order_by("-sent_at")
+    return render(request, "gallery/inbox.html", {"messages": messages})
+
+
+@login_required
+def message_detail(request, pk):
+    message = get_object_or_404(Message, pk=pk, recipient=request.user)
+    # Jelöljük az üzenetet olvasottként
+    if not message.is_read:
+        message.is_read = True
+        message.save()
+    return render(request, "gallery/message_detail.html", {"message": message})
