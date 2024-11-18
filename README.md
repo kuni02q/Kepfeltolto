@@ -34,3 +34,5 @@ Add meg a kért adatokat (felhasználónév, e-mail cím, jelszó).
 python manage.py runserver
 ```
 A szerver alapértelmezés szerint a http://127.0.0.1:8000/ címen lesz elérhető.
+
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
