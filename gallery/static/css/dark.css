@@ -124,8 +124,8 @@ h1, h2, h3 {
 
 /* Kereső űrlap stílusai */
 .search-form {
-    display: inline-block;
-    margin-left: 40px;
+    display: table;
+    margin: auto;
 }
 
 .search-form input[type="text"] {
