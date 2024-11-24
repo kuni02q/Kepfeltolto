@@ -5,10 +5,12 @@ body {
     margin: 0;
     padding: 0;
     background-color: #EAE7DC;
+    color: #333;
 }
 
-a{
+a {
     text-decoration: none;
+    color: inherit;
 }
 
 /* Konténer */
@@ -44,21 +46,16 @@ a{
 .site-title {
     margin: 0;
     font-size: 1.5em;
-    color: #fff;
+    color: #E85A4F;
     margin-left: 10px;
 }
 
-.site-title {
-    color: #E98074;
-}
 .best {
     color: #E85A4F;
 }
-.site-title  {
-    color: #E85A4F;
-}
-.gallery{
-   color: #8E8D8A
+
+.gallery {
+    color: #8E8D8A;
 }
 
 /* Navigációs sáv stílusai */
@@ -317,7 +314,7 @@ footer {
     margin: 20px auto;
     padding: 20px;
     text-align: left;
-    background-color: #fff;
+    background-color: #fff; /* Világos háttér */
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
@@ -325,6 +322,7 @@ footer {
 .upload-container h2 {
     text-align: center;
     margin-bottom: 20px;
+    color: #E85A4F;
 }
 
 .upload-container p {
@@ -352,6 +350,7 @@ footer {
     font-weight: bold;
     margin-bottom: 5px;
     display: block;
+    color: #333;
 }
 
 .form-group input,
@@ -361,6 +360,8 @@ footer {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    background-color: #fff; /* Világos háttér a beviteli mezőknek */
+    color: #333;
 }
 
 .form-group .form-text {
@@ -369,7 +370,7 @@ footer {
 }
 
 .error {
-    color: red;
+    color: #ff4d4d; /* Piros hibaüzenet */
     font-size: 0.9em;
 }
 
@@ -393,6 +394,10 @@ footer {
     text-align: center;
 }
 
+.image-preview p {
+    color: #333;
+}
+
 .image-preview img {
     max-width: 100%;
     height: auto;
@@ -400,31 +405,53 @@ footer {
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+
 /* Üzenetek listája */
-.message-list {
+.notification-list {
     list-style: none;
     padding: 0;
     text-align: left;
 }
 
-.message-list li {
+.notification-list li {
+    display: flex;
+    align-items: center;
     padding: 10px;
     margin-bottom: 10px;
     border-bottom: 1px solid #ccc;
 }
 
-.message-list li.unread {
+.notification-image-thumbnail {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    margin-right: 10px;
+    border-radius: 4px;
+}
+
+.notification-list li.unread {
     background-color: #D8C3A5;
     font-weight: bold;
 }
 
-.message-list a {
+.notification-list a {
     text-decoration: none;
-    color: #8E8D8A;
+    color: #333;
 }
 
-.message-list a:hover {
+.notification-list a:hover {
     text-decoration: underline;
+}
+
+.notification-list .timestamp {
+    display: block;
+    font-size: 0.8em;
+    color: #888;
+}
+
+.unread-count {
+    color: red;
+    font-weight: bold;
 }
 
 /* Generált kép stílusai */
@@ -497,12 +524,12 @@ footer {
 .profile-gallery {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between; /* Képek közötti tér egyenletes elosztása */
+    justify-content: space-between;
     margin: -2px;
 }
 
 .profile-gallery .gallery-item {
-    width: calc(33.333% - 15px); /* Három oszlopos elrendezés */
+    width: calc(33.333% - 15px);
     margin: 2px;
     box-sizing: border-box;
     display: flex;
@@ -526,7 +553,15 @@ footer {
 .profile-gallery .gallery-item button {
     margin-top: 5px;
     width: 100%;
+    background-color: #E85A4F;
+    color: #fff;
 }
+
+.profile-gallery .gallery-item button:hover {
+    background-color: #E98074;
+}
+
+/* Címke stílusai */
 .tag {
     display: inline-block;
     background-color: #EAE7DC;
@@ -537,53 +572,209 @@ footer {
     font-size: 0.8em;
 }
 
+/* Like és Dislike gombok */
 .like-dislike-buttons {
     display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
 }
 
-.comments-section{
-    background-color: red;
+.like-dislike-buttons form {
+    margin: 0;
 }
 
-.profiles-grid{
+.like-btn, .dislike-btn {
+    background-color: #8E8D8A;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.like-btn:hover, .dislike-btn:hover {
+    background-color: #E98074;
+}
+
+/* Kommentek stílusai */
+.comments-section {
+    margin-top: 30px;
+}
+
+.comment {
+    margin-bottom: 15px;
+}
+
+.comment .comment-content {
+    display: flex;
+    align-items: flex-start;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.comment .profile-picture {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+.comment .comment-text {
+    flex: 1;
+}
+
+.comment .comment-text a {
+    color: #E85A4F;
+    text-decoration: none;
+}
+
+.comment .comment-text a:hover {
+    text-decoration: underline;
+}
+
+.comment .comment-text p {
+    margin: 5px 0;
+    color: #333;
+}
+
+.comment .comment-date {
+    font-size: 0.8em;
+    color: #888;
+}
+
+.reply-link {
+    font-size: 0.9em;
+    color: #007BFF;
+    cursor: pointer;
+    margin-left: 50px;
+    margin-top: 5px;
+}
+
+.reply-form {
+    margin-top: 10px;
+    margin-left: 50px;
+}
+
+.comment .replies {
+    margin-left: 50px;
+    border-left: 1px solid #ccc;
+    padding-left: 10px;
+    margin-top: 10px;
+}
+
+/* Komment beviteli mező stílusai */
+.comment-input {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.comment-input input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    margin-right: 10px;
+}
+
+.comment-input button {
+    background-color: #E85A4F;
+    border: none;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.comment-input button:hover {
+    background-color: #E98074;
+}
+
+/* Profilok listája */
+.profiles-grid {
     margin: 0 auto;
 }
 
-.profiles-item{
+.profiles-item {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-.profile-picture{
+.profile-picture {
     width: 50px;
     height: 50px;
     border-radius: 50%;
     object-fit: cover;
     margin-right: 10px;
 }
+/* GYIK szekció */
+.faq-section {
+    margin: 20px 0;
+}
 
-.faq {
-    max-width: 700px;
-    margin-top: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid  #E98074;
+.faq-item {
+    background-color: #f9f9f9; /* Világos háttérszín */
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc; /* Vékony szegély a doboz körül */
+}
+
+.faq-item h4 {
+    margin: 0 0 10px;
+    color: #E85A4F; /* Téma szín */
+}
+
+.faq-item p {
+    margin: 0;
+    color: #333; /* Sötétebb szövegszín a jobb olvashatóság érdekében */
+}
+
+/* Segítségkérés űrlap */
+.help-section {
+    margin: 40px 0;
+}
+
+.help-section h3 {
+    color: #E85A4F; /* Téma szín */
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    background-color: #fff; /* Világos háttérszín */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    color: #333;
+}
+
+button[type="submit"] {
+    background-color: #E85A4F; /* Téma szín */
+    border: none;
+    padding: 10px 20px;
+    color: #fff;
     cursor: pointer;
+    border-radius: 5px;
 }
 
-.question {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.question h3 {
-    font-size: 1.8rem;
-}
-
-
-.answer p {
-    padding-top: 1rem;
-    line-height: 1.6rem;
-    font-size: 1.4rem;
+button[type="submit"]:hover {
+    background-color: #E98074; /* Világosabb árnyalat hover esetén */
 }

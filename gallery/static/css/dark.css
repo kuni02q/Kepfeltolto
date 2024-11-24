@@ -8,8 +8,9 @@ body {
     color: #f0f0f0;
 }
 
-a{
+a {
     text-decoration: none;
+    color: inherit;
 }
 
 /* Konténer */
@@ -45,19 +46,11 @@ a{
 .site-title {
     margin: 0;
     font-size: 1.5em;
-    color: #ffd700;
+    color: #ffa07a;
     margin-left: 10px;
 }
 
-.site-title {
-    color: #ffa07a;
-}
-
 .best {
-    color: #ffa07a;
-}
-
-.site-title {
     color: #ffa07a;
 }
 
@@ -325,8 +318,8 @@ footer {
     margin: 20px auto;
     padding: 20px;
     text-align: left;
-    background-color: #2b2b2b;
-    color: #f0f0f0;
+    background-color: #2b2b2b; /* Sötét háttér */
+    color: #f0f0f0; /* Világos szöveg */
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
@@ -372,7 +365,7 @@ footer {
     padding: 8px;
     border: 1px solid #555;
     border-radius: 4px;
-    background-color: #333;
+    background-color: #333; /* Sötétebb háttér a beviteli mezőknek */
     color: #f0f0f0;
 }
 
@@ -381,9 +374,14 @@ footer {
     color: #999;
 }
 
+.error {
+    color: #ff4d4d; /* Piros hibaüzenet */
+    font-size: 0.9em;
+}
+
 .upload-form button {
     background-color: #ffa07a;
-    color: #f0f0f0;
+    color: #1c1c1e;
     border: none;
     padding: 12px 24px;
     cursor: pointer;
@@ -401,6 +399,10 @@ footer {
     text-align: center;
 }
 
+.image-preview p {
+    color: #f0f0f0;
+}
+
 .image-preview img {
     max-width: 100%;
     height: auto;
@@ -410,31 +412,51 @@ footer {
 }
 
 /* Üzenetek listája */
-.message-list {
+.notification-list {
     list-style: none;
     padding: 0;
     text-align: left;
 }
 
-.message-list li {
+.notification-list li {
+    display: flex; /* Hozzáadva, hogy a kép és a szöveg egymás mellett legyen */
+    align-items: center; /* Hozzáadva, hogy a kép és a szöveg vertikálisan középre igazodjon */
     padding: 10px;
     margin-bottom: 10px;
     border-bottom: 1px solid #555;
-    color: #f0f0f0;
 }
 
-.message-list li.unread {
-    background-color: #333;
+.notification-image-thumbnail {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    margin-right: 10px;
+    border-radius: 4px;
+}
+
+.notification-list li.unread {
+    background-color: #2b2b2b;
     font-weight: bold;
 }
 
-.message-list a {
+.notification-list a {
     text-decoration: none;
-    color: #ffa07a;
+    color: #f0f0f0;
 }
 
-.message-list a:hover {
+.notification-list a:hover {
     text-decoration: underline;
+}
+
+.notification-list .timestamp {
+    display: block;
+    font-size: 0.8em;
+    color: #888;
+}
+
+.unread-count {
+    color: #ffa07a;
+    font-weight: bold;
 }
 
 /* Generált kép stílusai */
@@ -506,12 +528,12 @@ footer {
 .profile-gallery {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between; /* Képek közötti tér egyenletes elosztása */
+    justify-content: space-between;
     margin: -2px;
 }
 
 .profile-gallery .gallery-item {
-    width: calc(33.333% - 15px); /* Három oszlopos elrendezés */
+    width: calc(33.333% - 15px);
     margin: 2px;
     box-sizing: border-box;
     display: flex;
@@ -554,55 +576,210 @@ footer {
     font-size: 0.8em;
 }
 
+/* Like és Dislike gombok */
 .like-dislike-buttons {
     display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
 }
 
-.comments-section{
-    background-color: red;
+.like-dislike-buttons form {
+    margin: 0;
 }
 
+.like-btn, .dislike-btn {
+    background-color: #555;
+    color: #f0f0f0;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 4px;
+}
 
-.profiles-grid{
+.like-btn:hover, .dislike-btn:hover {
+    background-color: #ffa07a;
+}
+
+/* Kommentek stílusai */
+.comments-section {
+    margin-top: 30px;
+}
+
+.comment {
+    margin-bottom: 15px;
+}
+
+.comment .comment-content {
+    display: flex;
+    align-items: flex-start; /* A szöveg a kép tetejétől indul */
+    background-color: #2b2b2b;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.comment .profile-picture {
+    flex-shrink: 0; /* A kép nem zsugorodik */
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+.comment .comment-text {
+    flex: 1;
+}
+
+.comment .comment-text a {
+    color: #ffa07a;
+    text-decoration: none;
+}
+
+.comment .comment-text a:hover {
+    text-decoration: underline;
+}
+
+.comment .comment-text p {
+    margin: 5px 0;
+    color: #f0f0f0;
+}
+
+.comment .comment-date {
+    font-size: 0.8em;
+    color: #888;
+}
+
+.reply-link {
+    font-size: 0.9em;
+    color: #ffa07a;
+    cursor: pointer;
+    margin-left: 50px;
+    margin-top: 5px;
+}
+
+.reply-form {
+    margin-top: 10px;
+    margin-left: 50px;
+}
+
+.comment .replies {
+    margin-left: 50px;
+    border-left: 1px solid #555;
+    padding-left: 10px;
+    margin-top: 10px;
+}
+
+/* Komment beviteli mező stílusai */
+.comment-input {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.comment-input input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    font-size: 1em;
+    background-color: #333;
+    color: #f0f0f0;
+    border: 1px solid #555;
+    border-radius: 20px;
+    margin-right: 10px;
+}
+
+.comment-input button {
+    background-color: #ffa07a;
+    border: none;
+    color: #f0f0f0;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.comment-input button:hover {
+    background-color: #ff7f50;
+}
+
+/* Profilok listája */
+.profiles-grid {
     margin: 0 auto;
 }
 
-.profiles-item{
+.profiles-item {
     display: flex;
     align-items: center;
     gap: 10px;
     margin-bottom: 50px;
 }
 
-.profile-picture{
+.profile-picture {
     width: 50px;
     height: 50px;
     border-radius: 50%;
     object-fit: cover;
     margin-right: 10px;
 }
+/* GYIK szekció */
+.faq-section {
+    margin: 20px 0;
+}
 
-.faq {
-    max-width: 700px;
-    margin-top: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid  #fff;
+.faq-item {
+    background-color: #2b2b2b;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.faq-item h4 {
+    margin: 0 0 10px;
+    color: #ffa07a;
+}
+
+.faq-item p {
+    margin: 0;
+    color: #f0f0f0;
+}
+
+/* Segítségkérés űrlap */
+.help-section {
+    margin: 40px 0;
+}
+
+.help-section h3 {
+    color: #ffa07a;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    color: #f0f0f0;
+    margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    background-color: #333;
+    border: 1px solid #555;
+    border-radius: 5px;
+    color: #f0f0f0;
+}
+
+button[type="submit"] {
+    background-color: #ffa07a;
+    border: none;
+    padding: 10px 20px;
+    color: #1c1c1e;
     cursor: pointer;
+    border-radius: 5px;
 }
 
-.question {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.question h3 {
-    font-size: 1.8rem;
-}
-
-
-.answer p {
-    padding-top: 1rem;
-    line-height: 1.6rem;
-    font-size: 1.4rem;
+button[type="submit"]:hover {
+    background-color: #ff7f50;
 }

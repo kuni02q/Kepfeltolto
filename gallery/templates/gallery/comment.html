@@ -1,0 +1,39 @@
+<!-- templates/gallery/comment.html -->
+{% load static %}
+<div class="comment">
+    <div class="comment-content">
+        <a href="{% url 'profile' comment.user.username %}">
+            {% if comment.user.profile.profile_image %}
+                <img src="{{ comment.user.profile.profile_image.url }}" alt="{{ comment.user.username }} profilképe" class="profile-picture">
+            {% else %}
+                <img src="{% static 'images/default_profile.png' %}" alt="Alapértelmezett profilkép" class="profile-picture">
+            {% endif %}
+        </a>
+        <div class="comment-text">
+            <a href="{% url 'profile' comment.user.username %}">
+                <strong>{{ comment.user.username }}</strong>
+            </a>
+            <p>{{ comment.content }}</p>
+            <span class="comment-date">{{ comment.created_at }}</span>
+        </div>
+    </div>
+    <!-- Válasz link -->
+    {% if user.is_authenticated %}
+        <a href="#" class="reply-link" data-comment-id="{{ comment.id }}">Válasz</a>
+    {% endif %}
+    <!-- Válasz űrlap -->
+    <div class="reply-form" id="reply-form-{{ comment.id }}" style="display: none;">
+        <form method="post">
+            {% csrf_token %}
+            <input type="text" name="content" placeholder="Add a reply..." required>
+            <input type="hidden" name="parent" value="{{ comment.id }}">
+            <button type="submit">Post</button>
+        </form>
+    </div>
+    <!-- Válaszok megjelenítése -->
+    <div class="replies">
+        {% for reply in comment.replies.all %}
+            {% include 'gallery/comment.html' with comment=reply %}
+        {% endfor %}
+    </div>
+</div>

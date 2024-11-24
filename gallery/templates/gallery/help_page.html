@@ -4,37 +4,55 @@
 
 <h2>Segítség és GYIK</h2>
 <p>Itt található a gyakran ismételt kérdések listája és a segítségkérés lehetősége.</p>
-<div class = "faq">
-    <div class="question">
-        <h3>Regisztració</h3>
+
+<div class="faq-section">
+    <h3>Gyakran Ismételt Kérdések</h3>
+    
+    <div class="faq-item">
+        <h4>Hogyan regisztrálhatok az oldalon?</h4>
+        <p>A regisztrációhoz kattints a 'Regisztráció' gombra a felső navigációs sávban, majd töltsd ki a szükséges adatokat.</p>
     </div>
-    <div class="answer">
-        <p>
-            Kattints a regisztáció gombra és add meg a megfelelő adatokat. Figyelj oda hogy nem minden adat kotelező és a jelszónak vannak követelménei.
-        </p>
+    
+    <div class="faq-item">
+        <h4>Hogyan tölthetek fel képet?</h4>
+        <p>Bejelentkezés után kattints a 'Kép feltöltése' gombra, és kövesd az utasításokat a kép feltöltéséhez.</p>
     </div>
+    
+    <div class="faq-item">
+        <h4>Hogyan módosíthatom a profilomat?</h4>
+        <p>A profilod megtekintéséhez és szerkesztéséhez kattints a felhasználónevedre a navigációs sávban, majd válaszd a 'Profil szerkesztése' lehetőséget.</p>
+    </div>
+    
+    <div class="faq-item">
+        <h4>Elfelejtettem a jelszavamat. Mit tehetek?</h4>
+        <p>Kattints a 'Bejelentkezés' oldalon az 'Elfelejtett jelszó' linkre, és kövesd az utasításokat a jelszó visszaállításához.</p>
+    </div>
+    
+    <!-- További GYIK hozzáadása szükség szerint -->
 </div>
 
-<div class = "faq">
-    <div class="question">
-        <h3>Belépés</h3>
-    </div>
-    <div class="answer">
-        <p>
-            Kattints a belépés gombra és add meg a megfelelő adatokat. Figyelj oda hogy előzetes regisztració szükséges a belépéshez.
-        </p>
-    </div>
+<div class="help-section">
+    <h3>Segítségkérés</h3>
+    <p>Ha nem találtad meg a választ a kérdésedre, lépj kapcsolatba velünk az alábbi űrlap kitöltésével:</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="name">Név:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email cím:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="message">Üzenet:</label>
+            <textarea id="message" name="message" rows="5" required></textarea>
+        </div>
+        
+        <button type="submit">Küldés</button>
+    </form>
 </div>
-
-<div class = "faq">
-    <div class="question">
-        <h3>Képfeltöltés</h3>
-    </div>
-    <div class="answer">
-        <p>
-            Kattints a fotó hozzáadáása gombra. Válaszd ki a feltolteni kívánt képet, add meg a címét, írj leírást a képhez, válassz tageket a listrából. Ha MIndennel végeztél kattints a feltoltés gopmbra.
-        </p>
-    </div>
-</div>
-
 {% endblock %}

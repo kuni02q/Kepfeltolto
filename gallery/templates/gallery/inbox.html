@@ -1,16 +1,24 @@
 {% extends 'gallery/base.html' %}
 
 {% block content %}
-<h2>Beérkező üzenetek</h2>
-<ul class="message-list">
+<h2>Értesítések</h2>
+<ul class="notification-list">
     {% for message in messages %}
     <li class="{% if not message.is_read %}unread{% endif %}">
-        <a href="{% url 'message_detail' message.pk %}">
-            <strong>{{ message.subject }}</strong> - {{ message.sender.username }} - {{ message.sent_at }}
+        <a href="{% url 'image_detail' message.related_image.pk %}">
+            <img src="{{ message.related_image.image_file.url }}" alt="{{ message.related_image.title }}" class="notification-image-thumbnail">
+            {% if message.message_type == 'like' %}
+                <strong>{{ message.sender.username }}</strong> kedvelte a képedet: <em>{{ message.related_image.title }}</em>
+            {% elif message.message_type == 'comment' %}
+                <strong>{{ message.sender.username }}</strong> hozzászólt a képedhez: <em>{{ message.related_image.title }}</em>
+            {% else %}
+                <strong>{{ message.subject }}</strong> - {{ message.sender.username }}
+            {% endif %}
+            <span class="timestamp">{{ message.sent_at|date:"Y-m-d H:i" }}</span>
         </a>
     </li>
     {% empty %}
-    <p>Nincsenek üzeneteid.</p>
+    <p>Nincsenek értesítéseid.</p>
     {% endfor %}
 </ul>
 {% endblock %}
