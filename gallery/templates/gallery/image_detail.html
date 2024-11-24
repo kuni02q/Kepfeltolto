@@ -1,3 +1,4 @@
+<!-- image_detail.html -->
 {% extends 'gallery/base.html' %}
 {% load static %}
 
@@ -8,7 +9,7 @@
     <p>{{ image.description }}</p>
 
     <!-- Feltöltő megjelenítése -->
-    <p>Feltöltötte: 
+    <p>Feltöltötte:
         <a href="{% url 'profile' image.uploader.username %}">
             {{ image.uploader.username }}
         </a>
@@ -44,34 +45,38 @@
     <div class="comments-section">
         <h3>Hozzászólások</h3>
         {% for comment in comments %}
-            <div class="comment">
-                <a href="{% url 'profile' comment.user.username %}">
-                {% if comment.user.profile.profile_image %}
-                    <img src="{{ comment.user.profile.profile_image.url }}" alt="{{ user.username }} profilképe" class="profile-picture">
-                {% else %}
-                    <img src="{% static 'images/default_profile.png' %}" alt="Alapértelmezett profilkép" class="profile-picture">
-                {% endif %}
-                <p><strong>{{ comment.user.username }}</strong> - {{ comment.created_at }}</p>
-                </a>
-            <p>{{ comment.content }}</p>
-            </div>
+            {% include 'gallery/comment.html' %}
         {% empty %}
             <p>Nincsenek hozzászólások.</p>
         {% endfor %}
+
+        <!-- Új hozzászólás űrlapja -->
+        {% if user.is_authenticated %}
+            <div class="comment-input">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="text" name="content" placeholder="Add a comment..." required>
+                    <button type="submit">Post</button>
+                </form>
+            </div>
+        {% else %}
+            <p>Kérjük, <a href="{% url 'login' %}">jelentkezz be</a>, hogy hozzászólhass.</p>
+        {% endif %}
     </div>
-
-    <!-- Új hozzászólás űrlapja -->
-    {% if user.is_authenticated %}
-        <h4>Új hozzászólás</h4>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Hozzászólás beküldése</button>
-        </form>
-    {% else %}
-        <p>Kérjük, <a href="{% url 'login' %}">jelentkezz be</a>, hogy hozzászólhass.</p>
-    {% endif %}
-
-
 </div>
+
+<!-- JavaScript a válasz linkek kezeléséhez -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var replyLinks = document.querySelectorAll('.reply-link');
+    replyLinks.forEach(function(link) {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            var commentId = this.getAttribute('data-comment-id');
+            var replyForm = document.getElementById('reply-form-' + commentId);
+            replyForm.style.display = replyForm.style.display === 'none' ? 'block' : 'none';
+        });
+    });
+});
+</script>
 {% endblock %}

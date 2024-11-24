@@ -55,7 +55,9 @@ ROOT_URLCONF = 'bestgallery.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -63,12 +65,14 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'gallery.context_processors.unread_messages_processor',
             ],
         },
     },
 ]
 
 WSGI_APPLICATION = 'bestgallery.wsgi.application'
+
 
 
 # Database
@@ -126,7 +130,13 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'zerdanman@gmail.com'
+EMAIL_HOST_PASSWORD = 'email_jelszavad'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 #LOGOUT_REDIRECT_URL = 'image_list'
 LOGIN_URL = '/login/'  # Ha szükséges

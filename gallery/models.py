@@ -1,3 +1,4 @@
+#models.py
 import base64
 
 import openai
@@ -45,6 +46,7 @@ class Comment(models.Model):
     image = models.ForeignKey(Image, related_name="comments", on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -63,20 +65,33 @@ class Profile(models.Model):
 
 
 class Message(models.Model):
+    MESSAGE_TYPE_CHOICES = [
+        ('like', 'Like'),
+        ('comment', 'Comment'),
+        ('message', 'Message'),
+    ]
+
     sender = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="sent_messages"
+        User, on_delete=models.CASCADE, related_name='sent_messages', null=True, blank=True
     )
     recipient = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="received_messages"
+        User, on_delete=models.CASCADE, related_name='received_messages'
     )
-    subject = models.CharField(max_length=255)
-    body = models.TextField()
+    subject = models.CharField(max_length=255, blank=True)
+    body = models.TextField(blank=True)
     is_read = models.BooleanField(default=False)
     sent_at = models.DateTimeField(auto_now_add=True)
+    message_type = models.CharField(
+        max_length=10,
+        choices=MESSAGE_TYPE_CHOICES,
+        default='message'
+    )
+    related_image = models.ForeignKey(
+        'Image', on_delete=models.CASCADE, null=True, blank=True, related_name='notifications'
+    )
 
     def __str__(self):
-        return f"Message from {self.sender} to {self.recipient} - {self.subject}"
-
+        return f"{self.get_message_type_display()} from {self.sender} to {self.recipient}"
 
 class FavoriteImage(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

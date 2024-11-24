@@ -1,9 +1,10 @@
+#views.py
 import base64
 import os
 import uuid
-
+from django.core.mail import send_mail
+#import requests
 import openai
-import requests
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login, logout
@@ -49,35 +50,40 @@ def image_detail(request, pk):
     image = get_object_or_404(Image, pk=pk)
     comments = image.comments.all()
     form = CommentForm()
-
-    if request.method == "POST":
+    if request.method == 'POST':
         form = CommentForm(request.POST)
         if form.is_valid():
+            parent = form.cleaned_data.get('parent')
+            parent_obj = None
+            if parent:
+                parent_obj = Comment.objects.get(id=parent.id)
             comment = form.save(commit=False)
             comment.image = image
             comment.user = request.user
+            comment.parent = parent_obj
             comment.save()
-            # Üzenet létrehozása a feltöltőnek
-            if (
-                image.uploader != request.user
-            ):  # Csak akkor küld értesítést, ha nem a feltöltő kommentel
+            # Értesítés küldése
+            recipient = image.uploader
+            if parent_obj and parent_obj.user != request.user:
+                recipient = parent_obj.user
+            if recipient != request.user:
                 Message.objects.create(
                     sender=request.user,
-                    recipient=image.uploader,
-                    title=image.title,
-                    subject="Új hozzászólás a képhez",
-                    body=f"{request.user.username}hozzászólt a képhez: {image.title}",
+                    recipient=recipient,
+                    message_type='comment',
+                    related_image=image,
+                    subject='',
+                    body=''
                 )
-
-        return redirect("image_detail", pk=image.id)
-
+            return redirect('image_detail', pk=image.id)
+    comments = image.comments.filter(parent=None)
     return render(
         request,
-        "gallery/image_detail.html",
+        'gallery/image_detail.html',
         {
-            "image": image,
-            "comments": comments,
-            "form": form,
+            'image': image,
+            'comments': comments,
+            'form': form,
         },
     )
 
@@ -85,9 +91,7 @@ def image_detail(request, pk):
 @login_required
 def like_image(request, image_id):
     image = get_object_or_404(Image, id=image_id)
-    if (
-        request.user in image.dislikes.all()
-    ):  # nem lehet egyszerre like-olni és dislike-olni egy képet, ezért ha már dislikeolva volt, onnan eltávolítja
+    if request.user in image.dislikes.all():
         image.dislikes.remove(request.user)
     if request.user not in image.likes.all():
         image.likes.add(request.user)
@@ -95,13 +99,14 @@ def like_image(request, image_id):
             Message.objects.create(
                 sender=request.user,
                 recipient=image.uploader,
-                subject="Új 'Tetszik' reakció a képedre",
-                body=f"{request.user.username} kedvelte a képedet: {image.title}. ",
+                message_type='like',
+                related_image=image,
+                subject='',
+                body=''
             )
     else:
         image.likes.remove(request.user)
-    return redirect("image_detail", pk=image_id)
-
+    return redirect('image_detail', pk=image_id)
 
 @login_required
 def dislike_image(request, image_id):
@@ -317,8 +322,9 @@ def add_comment(request, image_id):
 @login_required
 def inbox_view(request):
     messages = Message.objects.filter(recipient=request.user).order_by("-sent_at")
+    # Az összes üzenetet olvasottként jelöljük
+    messages.update(is_read=True)
     return render(request, "gallery/inbox.html", {"messages": messages})
-
 
 @login_required
 def message_detail(request, pk):
@@ -328,3 +334,24 @@ def message_detail(request, pk):
         message.is_read = True
         message.save()
     return render(request, "gallery/message_detail.html", {"message": message})
+
+
+def help_page(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        message_content = request.POST.get('message')
+        
+        # Üzenet küldése emailben (vagy más feldolgozás)
+        send_mail(
+            f'Segítségkérés - {name}',
+            message_content,
+            email,
+            ['admin@example.com'],  # Itt add meg az admin email címét
+            fail_silently=False,
+        )
+        
+        messages.success(request, 'Üzenetedet elküldtük. Hamarosan felvesszük veled a kapcsolatot.')
+        return redirect('help_page')
+    
+    return render(request, 'gallery/help_page.html')

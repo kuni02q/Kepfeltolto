@@ -95,7 +95,10 @@ class SearchForm(forms.Form):
 
 
 class CommentForm(forms.ModelForm):
+    content = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Add a comment...'}))
+
     class Meta:
         model = Comment
-        fields = ["content"]
-        labels = {"content": "Hozzászólás"}
+        fields = ["content", "parent"]
+        labels = {"content": "", "parent": ""}
+        widgets = {'parent': forms.HiddenInput()}
