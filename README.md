@@ -103,7 +103,8 @@ A Best Gallery célja egy olyan képmegosztó platform létrehozása, amely egys
 | Kedvencek kezelése | K10 |
 | Jelszó módosítása és elfelejtett jelszó | K11, K12 |
 | Reszponzív dizájn | K13 |
-| Segítség és támogatás | K14 |
+| Téma váltás | K14 |
+| Segítség és támogatás | K15 |
 
 ### 8. Képernyőtervek
 **Főoldal**
@@ -153,7 +154,8 @@ A Best Gallery célja egy olyan képmegosztó platform létrehozása, amely egys
 | Jelszó módosítása | K11 |
 | Elfelejtett jelszó kezelése | K12 |
 | Reszponzív dizájn | K13 |
-| Segítség és támogatás | K14 |
+| Téma váltás | K14 |
+| Segítség és támogatás | K15 |
 
 ### 11. Fogalomszótár
 - **Profil**: A felhasználó személyes oldala az alkalmazásban.
