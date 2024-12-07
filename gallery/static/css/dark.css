@@ -524,12 +524,18 @@ footer {
     background-color: #ff7f50;
 }
 
-/* Profil galéria */
+/* Eredeti kód */
 .profile-gallery {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     margin: -2px;
+
+    /* Új tulajdonságok a görgetés engedélyezéséhez */
+    /* Tegyük fel, hogy korlátozott magasságot adunk neki,
+       így ha több kép van, scroll-ozni lehessen */
+    max-height: 80vh; /* vagy más érték, ami neked megfelelő */
+    overflow-y: auto; /* engedélyezi a függőleges görgetést */
 }
 
 .profile-gallery .gallery-item {

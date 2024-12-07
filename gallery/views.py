@@ -355,3 +355,24 @@ def help_page(request):
         return redirect('help_page')
     
     return render(request, 'gallery/help_page.html')
+
+def load_more_images(request):
+    page = request.GET.get('page', 1)
+    images_list = Image.objects.all().order_by('-uploaded_at')
+    paginator = Paginator(images_list, 20)  # Oldalanként 20 kép
+    page_obj = paginator.get_page(page)
+
+    images_data = []
+    for img in page_obj.object_list:
+        images_data.append({
+            'id': img.id,
+            'url': img.image_file.url,
+            'title': img.title
+        })
+
+    data = {
+        'images': images_data,
+        'has_next': page_obj.has_next(),
+        'next_page': page_obj.next_page_number() if page_obj.has_next() else None
+    }
+    return JsonResponse(data)

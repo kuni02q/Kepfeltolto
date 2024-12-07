@@ -2,9 +2,10 @@
 {% load static %}
 
 {% block content %}
-
 <h2>Legújabb képek</h2>
-<div class="gallery-grid">
+
+<!-- A konténer, amibe a képeket rakjuk -->
+<div class="gallery-grid" id="image-container">
     {% for image in images %}
     <div class="gallery-item">
         <a href="{% url 'image_detail' image.pk %}">
@@ -13,24 +14,98 @@
     </div>
     {% endfor %}
 </div>
+
+<!-- Töltés jel (spinner) -->
+<div id="loading" style="text-align:center; display:none; margin:20px;">
+    <img src="{% static 'images/loading.gif' %}" alt="Betöltés...">
+</div>
+
+<!-- Következő oldal jelölő -->
+{% if page_obj.has_next %}
+    <div id="next-page" data-next-page="{{ page_obj.next_page_number }}"></div>
+{% else %}
+    <div id="next-page" data-next-page=""></div>
+{% endif %}
 {% endblock %}
 
 {% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{% static 'js/imagesloaded.pkgd.min.js' %}"></script>
 <script src="{% static 'js/masonry.pkgd.min.js' %}"></script>
 <script>
-    // Masonry inicializálása a képek betöltése után
-    var grid = document.querySelector('.gallery-grid');
-    var msnry;
+    var loading = false;
+    var $grid = $('.gallery-grid');
 
-    imagesLoaded(grid, function() {
-        // Masonry inicializálása
-        msnry = new Masonry( grid, {
+    // Masonry inicializálása az induló képekkel
+    var msnry;
+    imagesLoaded($grid[0], function() {
+        msnry = new Masonry($grid[0], {
             itemSelector: '.gallery-item',
             columnWidth: '.gallery-item',
             percentPosition: true,
             gutter: 20
         });
+    });
+
+    function loadMoreImages() {
+        if (loading) return;
+        
+        var nextPage = $('#next-page').data('next-page');
+        if (!nextPage) return; // Nincs további oldal
+
+        loading = true;
+        $('#loading').show();
+
+        $.ajax({
+            url: "{% url 'load_more_images' %}?page=" + nextPage,
+            type: "GET",
+            dataType: "json",
+            success: function(data) {
+                var itemsHTML = '';
+                data.images.forEach(function(image) {
+                    itemsHTML += '<div class="gallery-item">' +
+                                    '<a href="/image/' + image.id + '/">' +
+                                        '<img src="' + image.url + '" alt="' + image.title + '">' +
+                                    '</a>' +
+                                 '</div>';
+                });
+
+                // Az új elemek jQuery objektummá alakítása
+                var $items = $(itemsHTML);
+
+                // Amint az új képek betöltődtek, illesszük őket a Masonry-ba
+                $items.imagesLoaded(function() {
+                    $grid.append($items);
+                    msnry.appended($items);
+                    msnry.layout(); // frissítsük a Masonry elrendezést
+
+                    if (data.has_next) {
+                        $('#next-page').data('next-page', data.next_page);
+                    } else {
+                        $('#next-page').data('next-page', '');
+                    }
+
+                    loading = false;
+                    $('#loading').hide();
+                });
+            },
+            error: function() {
+                loading = false;
+                $('#loading').hide();
+            }
+        });
+    }
+
+    // Görgetés figyelése
+    $(window).on('scroll', function() {
+        var scrollTop = $(this).scrollTop();
+        var windowHeight = $(this).height();
+        var docHeight = $(document).height();
+
+        // Ha közel az aljához az oldal
+        if (docHeight - windowHeight - scrollTop < 300) {
+            loadMoreImages();
+        }
     });
 </script>
 {% endblock %}
