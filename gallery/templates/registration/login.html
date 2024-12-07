@@ -1,10 +1,211 @@
 {% extends 'gallery/base.html' %}
 
 {% block content %}
-<h2>Bejelentkezés</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Bejelentkezés</button>
-</form>
+<div class="login-box">
+    <h2 class="login-title">
+        Bejelentkezés
+        <span class="info-icon" tabindex="0">ℹ
+            <span class="tooltip-text">
+                <ul>
+                    <li>Adja meg a felhasználónevét és jelszavát a bejelentkezéshez.</li>
+                    <li>A bejelentkezés után hozzáférhet a fiókjához és a személyes adataihoz.</li>
+                    
+                </ul>
+            </span>
+        </span>
+    </h2>
+
+    <form method="post" class="login-form">
+        {% csrf_token %}
+
+        <div class="login-field {% if form.username.errors %}login-error{% endif %}">
+            <label for="id_username">Felhasználónév *</label>
+            {{ form.username }}
+            <small class="login-help">Írd be a felhasználónevedet, amivel regisztráltál.</small>
+            {% if form.username.errors %}
+                <div class="login-error-msg">{{ form.username.errors.as_text }}</div>
+            {% endif %}
+        </div>
+
+        <div class="login-field {% if form.password.errors %}login-error{% endif %}">
+            <label for="id_password">Jelszó *</label>
+            {{ form.password }}
+            <small class="login-help">Írd be a jelszavadat.</small>
+            {% if form.password.errors %}
+                <div class="login-error-msg">{{ form.password.errors.as_text }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="login-button">Bejelentkezés</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+/* Stílusok kizárólag ehhez az oldalhoz, a fő CSS módosítása nélkül */
+
+/* Doboz a form körül */
+.login-box {
+    max-width: 400px;
+    margin: 60px auto;
+    background: var(--form-bg, #fff); /* az input mezőknek megfelelő háttér */
+    padding: 25px 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    font-size: 16px;
+    color: inherit; /* örökli a szövegszínt a témából */
+    text-align: left;
+}
+
+/* Címsor és info ikon */
+.login-title {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 2em;
+    font-weight: 600;
+    position: relative;
+    color: inherit;
+}
+
+/* Információ ikon és tooltip */
+.info-icon {
+    display: inline-block;
+    background-color: var(--highlight-color, #E85A4F);
+    color: #fff;
+    font-size: 0.8em;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    text-align: center;
+    line-height: 22px;
+    margin-left: 10px;
+    position: relative;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.tooltip-text {
+    visibility: hidden;
+    position: absolute;
+    top: 50%;
+    left: 110%; /* kicsit jobbra az ikontól */
+    transform: translateY(-50%);
+    background-color: var(--form-bg, #fff); /* input-bg */
+    color: var(--form-color, #333); /* input-text color */
+    border: 1px solid var(--form-border, #ccc);
+    border-radius: 6px;
+    padding: 8px;
+    width: 220px;
+    font-size: 0.8em;
+    line-height: 1.3em;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 10;
+}
+
+.tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 50%; 
+    right: 100%; 
+    transform: translateY(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent var(--form-border, #ccc) transparent transparent;
+}
+
+.tooltip-text ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin: 0;
+}
+
+.tooltip-text li {
+    margin-bottom: 5px;
+}
+
+/* Ha az ikon fölé visszük az egeret vagy fókuszba kerül, látható a tooltip */
+.info-icon:hover .tooltip-text,
+.info-icon:focus .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* A form input-jainak, segédszövegeinek, hibaüzeneteinek stílusai a meglévő koncepció alapján */
+.login-form { 
+    font-size: 16px; 
+}
+
+.login-field { 
+    margin-bottom: 25px; 
+}
+
+.login-field label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    color: inherit;
+}
+
+.login-field input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 1em;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    border: 1px solid var(--form-border, #ccc);
+    background-color: var(--form-bg, #fff);
+    color: var(--form-color, #333);
+}
+
+.login-field input:focus {
+    border-color: #007BFF;
+    box-shadow: 0 0 5px rgba(0,123,255,0.3);
+}
+
+.login-help {
+    display: block;
+    font-size: 0.9em;
+    color: var(--help-color, #888);
+    margin-top: 5px;
+    line-height: 1.4em;
+}
+
+.login-error input {
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 5px rgba(231,76,60,0.3);
+}
+
+.login-error-msg {
+    margin-top: 8px;
+    font-size: 0.9em;
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.login-button {
+    width: 100%;
+    background-color: var(--highlight-color, #E85A4F);
+    color: #fff;
+    padding: 14px 0;
+    font-size: 1.1em;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+    text-align: center;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.login-button:hover {
+    background-color: #E98074;
+}
+</style>
 {% endblock %}

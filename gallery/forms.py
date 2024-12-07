@@ -38,6 +38,9 @@ class ImageForm(forms.ModelForm):
 
 
 class SignUpForm(UserCreationForm):
+    error_messages = {
+        'password_mismatch': "A két jelszó nem egyezik meg."
+    }
     email = forms.EmailField(required=True)
     first_name = forms.CharField(
         max_length=30, required=False, help_text="Nem kötelező."

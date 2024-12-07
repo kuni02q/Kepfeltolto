@@ -1,3 +1,11 @@
+:root {
+    --form-bg: #fff;
+    --form-color: #333;
+    --form-border: #ccc;
+    --highlight-color: #E85A4F;
+    --help-color: #888;
+}
+
 /* Alap stílusok */
 body {
     font-family: Arial, sans-serif;
