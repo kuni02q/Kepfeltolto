@@ -1,9 +1,9 @@
-#views.py
+# views.py
 import base64
 import os
 import uuid
-from django.core.mail import send_mail
-#import requests
+
+# import requests
 import openai
 from django.conf import settings
 from django.contrib import messages
@@ -11,19 +11,23 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import (
+    AddImageToGalleryForm,
     CommentForm,
+    GalleryForm,
     ImageForm,
     ProfileForm,
     ProfileUpdateForm,
     SearchForm,
     SignUpForm,
 )
-from .models import Comment, FavoriteImage, Image, Message, Profile, Tag
+from .models import Comment, FavoriteImage, Gallery, Image, Message, Profile, Tag
 
 
 def image_list(request):
@@ -50,40 +54,59 @@ def image_detail(request, pk):
     image = get_object_or_404(Image, pk=pk)
     comments = image.comments.all()
     form = CommentForm()
-    if request.method == 'POST':
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            parent = form.cleaned_data.get('parent')
-            parent_obj = None
-            if parent:
-                parent_obj = Comment.objects.get(id=parent.id)
-            comment = form.save(commit=False)
-            comment.image = image
-            comment.user = request.user
-            comment.parent = parent_obj
-            comment.save()
-            # Értesítés küldése
-            recipient = image.uploader
-            if parent_obj and parent_obj.user != request.user:
-                recipient = parent_obj.user
-            if recipient != request.user:
-                Message.objects.create(
-                    sender=request.user,
-                    recipient=recipient,
-                    message_type='comment',
-                    related_image=image,
-                    subject='',
-                    body=''
-                )
-            return redirect('image_detail', pk=image.id)
+
+    # Hozzáadás a galériához form kezelése
+    gallery_form = AddImageToGalleryForm(
+        user=request.user
+    )  # Az aktuális felhasználó galériáit tartalmazza
+
+    if request.method == "POST":
+        if "gallery_form" in request.POST:  # Ha a galéria form kerül elküldésre
+            gallery_form = AddImageToGalleryForm(user=request.user, data=request.POST)
+            if gallery_form.is_valid():
+                gallery = gallery_form.cleaned_data["gallery"]
+                image.gallery = gallery
+                image.save()
+                return redirect(
+                    "image_detail", pk=image.id
+                )  # Galéria hozzáadás után vissza a képtörzs oldalra
+        else:  # Ha a komment form kerül elküldésre
+            form = CommentForm(request.POST)
+            if form.is_valid():
+                parent = form.cleaned_data.get("parent")
+                parent_obj = None
+                if parent:
+                    parent_obj = Comment.objects.get(id=parent.id)
+                comment = form.save(commit=False)
+                comment.image = image
+                comment.user = request.user
+                comment.parent = parent_obj
+                comment.save()
+
+                # Értesítés küldése
+                recipient = image.uploader
+                if parent_obj and parent_obj.user != request.user:
+                    recipient = parent_obj.user
+                if recipient != request.user:
+                    Message.objects.create(
+                        sender=request.user,
+                        recipient=recipient,
+                        message_type="comment",
+                        related_image=image,
+                        subject="",
+                        body="",
+                    )
+                return redirect("image_detail", pk=image.id)
+
     comments = image.comments.filter(parent=None)
     return render(
         request,
-        'gallery/image_detail.html',
+        "gallery/image_detail.html",
         {
-            'image': image,
-            'comments': comments,
-            'form': form,
+            "image": image,
+            "comments": comments,
+            "form": form,
+            "gallery_form": gallery_form,  # A galéria formot is átadjuk a sablonnak
         },
     )
 
@@ -91,32 +114,69 @@ def image_detail(request, pk):
 @login_required
 def like_image(request, image_id):
     image = get_object_or_404(Image, id=image_id)
-    if request.user in image.dislikes.all():
-        image.dislikes.remove(request.user)
-    if request.user not in image.likes.all():
-        image.likes.add(request.user)
-        if image.uploader != request.user:
+    user = request.user
+
+    # Ha a felhasználó dislike-olta a képet, először azt eltávolítjuk
+    if user in image.dislikes.all():
+        image.dislikes.remove(user)
+
+    # Ha a felhasználó még nem like-olta a képet
+    if user not in image.likes.all():
+        image.likes.add(user)
+
+        # Ha a kép a "Tetszik" galériában van, hozzáadjuk
+        liked_gallery = Gallery.objects.filter(name="Tetszik", owner=user).first()
+        if liked_gallery:
+            image.gallery = liked_gallery  # A kép hozzáadása a galériához
+            image.save()
+
+        # Üzenet küldése a feltöltőnek
+        if image.uploader != user:
             Message.objects.create(
-                sender=request.user,
+                sender=user,
                 recipient=image.uploader,
-                message_type='like',
+                message_type="like",
                 related_image=image,
-                subject='',
-                body=''
+                subject="",
+                body="",
             )
+
     else:
-        image.likes.remove(request.user)
-    return redirect('image_detail', pk=image_id)
+        image.likes.remove(user)
+
+        # Ha a kép a "Tetszik" galériában van, eltávolítjuk
+        liked_gallery = Gallery.objects.filter(name="Tetszik", owner=user).first()
+        if liked_gallery:
+            try:
+                image.gallery.remove(liked_gallery)
+                image.save()
+            except Exception as e:
+                print(f"Error removing image from 'Tetszik' gallery: {e}")
+
+    return redirect("image_detail", pk=image_id)
+
 
 @login_required
 def dislike_image(request, image_id):
     image = get_object_or_404(Image, id=image_id)
-    if (
-        request.user in image.likes.all()
-    ):  # nem lehet egyszerre like-olni és dislike-olni egy képet, ezért ha már likeolva volt, onnan eltávolítja
+
+    # Ha a felhasználó már kedvelte a képet, akkor eltávolítjuk a like-t
+    if request.user in image.likes.all():
         image.likes.remove(request.user)
+
+        # Ha eltávolítja a like-ot, akkor eltávolítjuk a képet a "Tetszik" galériából
+        liked_gallery = Gallery.objects.filter(
+            name="Tetszik", user=request.user
+        ).first()
+        if liked_gallery:
+            liked_gallery.images.remove(
+                image
+            )  # Eltávolítjuk a képet a "Tetszik" galériából
+
+    # Ha a felhasználó még nem dislike-olta a képet, akkor hozzáadjuk a dislikes-hoz
     if request.user not in image.dislikes.all():
         image.dislikes.add(request.user)
+
         # Üzenet küldése a feltöltőnek, ha másik felhasználó nem kedvelte a képet
         if image.uploader != request.user:
             Message.objects.create(
@@ -127,6 +187,7 @@ def dislike_image(request, image_id):
             )
     else:
         image.dislikes.remove(request.user)
+
     return redirect("image_detail", pk=image_id)
 
 
@@ -164,8 +225,10 @@ def account_settings(request):
     user = request.user
     profile, created = Profile.objects.get_or_create(user=user)
     images = Image.objects.filter(uploader=user).order_by("-uploaded_at")
+    galleries = Gallery.objects.filter(owner=user)
 
-    if request.method == "POST":
+    # Profil frissítése
+    if request.method == "POST" and "profile_form" in request.POST:
         profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
         if profile_form.is_valid():
             profile_form.save()
@@ -173,10 +236,36 @@ def account_settings(request):
             return redirect("account_settings")
     else:
         profile_form = ProfileUpdateForm(instance=profile)
+
+    # Új galéria létrehozása
+    if request.method == "POST" and "gallery_form" in request.POST:
+        gallery_form = GalleryForm(request.POST, request.FILES)
+        if gallery_form.is_valid():
+            gallery = gallery_form.save(commit=False)
+            gallery.owner = user
+            gallery.save()
+            messages.success(request, "Új galéria sikeresen létrehozva!")
+            return redirect("account_settings")
+    else:
+        gallery_form = GalleryForm()
+
     return render(
         request,
         "gallery/account_settings.html",
-        {"profile_form": profile_form, "images": images},
+        {
+            "profile_form": profile_form,
+            "gallery_form": gallery_form,
+            "images": images,
+            "galleries": galleries,
+        },
+    )
+
+
+def gallery_detail(request, pk):
+    gallery = get_object_or_404(Gallery, pk=pk)
+    images = gallery.images.all()  # A galéria képeinek lekérése
+    return render(
+        request, "gallery/gallery_detail.html", {"gallery": gallery, "images": images}
     )
 
 
@@ -326,6 +415,7 @@ def inbox_view(request):
     messages.update(is_read=True)
     return render(request, "gallery/inbox.html", {"messages": messages})
 
+
 @login_required
 def message_detail(request, pk):
     message = get_object_or_404(Message, pk=pk, recipient=request.user)
@@ -337,42 +427,67 @@ def message_detail(request, pk):
 
 
 def help_page(request):
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        message_content = request.POST.get('message')
-        
+    if request.method == "POST":
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        message_content = request.POST.get("message")
+
         # Üzenet küldése emailben (vagy más feldolgozás)
         send_mail(
-            f'Segítségkérés - {name}',
+            f"Segítségkérés - {name}",
             message_content,
             email,
-            ['admin@example.com'],  # Itt add meg az admin email címét
+            ["admin@example.com"],  # Itt add meg az admin email címét
             fail_silently=False,
         )
-        
-        messages.success(request, 'Üzenetedet elküldtük. Hamarosan felvesszük veled a kapcsolatot.')
-        return redirect('help_page')
-    
-    return render(request, 'gallery/help_page.html')
+
+        messages.success(
+            request, "Üzenetedet elküldtük. Hamarosan felvesszük veled a kapcsolatot."
+        )
+        return redirect("help_page")
+
+    return render(request, "gallery/help_page.html")
+
 
 def load_more_images(request):
-    page = request.GET.get('page', 1)
-    images_list = Image.objects.all().order_by('-uploaded_at')
+    page = request.GET.get("page", 1)
+    images_list = Image.objects.all().order_by("-uploaded_at")
     paginator = Paginator(images_list, 20)  # Oldalanként 20 kép
     page_obj = paginator.get_page(page)
 
     images_data = []
     for img in page_obj.object_list:
-        images_data.append({
-            'id': img.id,
-            'url': img.image_file.url,
-            'title': img.title
-        })
+        images_data.append(
+            {"id": img.id, "url": img.image_file.url, "title": img.title}
+        )
 
     data = {
-        'images': images_data,
-        'has_next': page_obj.has_next(),
-        'next_page': page_obj.next_page_number() if page_obj.has_next() else None
+        "images": images_data,
+        "has_next": page_obj.has_next(),
+        "next_page": page_obj.next_page_number() if page_obj.has_next() else None,
+    }
+    return JsonResponse(data)
+
+def load_more_search_images(request):
+    page = request.GET.get("page", 1)
+    # Szűrés a GET paraméterek alapján (pl. tags)
+    tag_ids = request.GET.getlist("tags")  # több tags paraméter is jöhet
+    images = Image.objects.all()
+
+    # Ha vannak tag_ids, szűrjük a képeket
+    if tag_ids:
+        images = images.filter(tags__in=tag_ids).distinct()
+
+    paginator = Paginator(images.order_by("-uploaded_at"), 20)
+    page_obj = paginator.get_page(page)
+
+    images_data = []
+    for img in page_obj.object_list:
+        images_data.append({"id": img.id, "url": img.image_file.url, "title": img.title})
+
+    data = {
+        "images": images_data,
+        "has_next": page_obj.has_next(),
+        "next_page": page_obj.next_page_number() if page_obj.has_next() else None,
     }
     return JsonResponse(data)

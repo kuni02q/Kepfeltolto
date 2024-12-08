@@ -4,36 +4,132 @@
 {% block content %}
 <h2>Kép keresése címkék alapján</h2>
 
-<form method="get" class="search-form">
-    {{ form.as_p }}
-    <button type="submit">Keresés</button>
-</form>
+<div class="search-container">
+    <form method="get" class="search-form">
+        <div class="search-field-group">
+            {{ form.tags }}
+            <!-- Ha van más mező, azt is itt elhelyezheted -->
+            <button type="submit">Keresés</button>
+        </div>
+    </form>
+</div>
 
 {% if images %}
     <h3>Keresési eredmények:</h3>
-    <div class="gallery-grid">
+    <div class="gallery-grid" id="search-image-container">
         {% for image in images %}
         <div class="gallery-item">
             <a href="{% url 'image_detail' image.pk %}">
                 <img src="{{ image.image_file.url }}" alt="{{ image.title }}">
             </a>
-            <p>{{ image.title }}</p>
         </div>
         {% endfor %}
     </div>
+
+    <!-- Töltés jel (spinner) -->
+    <div id="loading" style="text-align:center; display:none; margin:20px;">
+        <img src="{% static 'images/loading.gif' %}" alt="Betöltés...">
+    </div>
+
+    {% if page_obj.has_next %}
+        <div id="next-page" data-next-page="{{ page_obj.next_page_number }}"></div>
+    {% else %}
+        <div id="next-page" data-next-page=""></div>
+    {% endif %}
 {% else %}
     <p>Nincs találat a megadott címkékre.</p>
 {% endif %}
 {% endblock %}
+
 {% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'js/imagesloaded.pkgd.min.js' %}"></script>
+<script src="{% static 'js/masonry.pkgd.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/i18n/hu.min.js"></script>
 <script>
     $(document).ready(function() {
-        $('.select2-multiple').select2({
+        // Select2 konfigurálása a témához illeszkedően
+        $('.select2-multiple, .select-single').select2({
             placeholder: "Válassz címkéket",
             allowClear: true,
             width: '100%',
             language: 'hu'
         });
+
+        var loading = false;
+        var $grid = $('#search-image-container');
+
+        {% if images %}
+        var msnry;
+        imagesLoaded($grid[0], function() {
+            msnry = new Masonry($grid[0], {
+                itemSelector: '.gallery-item',
+                columnWidth: '.gallery-item',
+                percentPosition: true,
+                gutter: 20
+            });
+        });
+
+        function loadMoreSearchImages() {
+            if (loading) return;
+
+            var nextPage = $('#next-page').data('next-page');
+            if (!nextPage) return;
+
+            loading = true;
+            $('#loading').show();
+
+            var queryString = window.location.search; 
+            
+            $.ajax({
+                url: "{% url 'load_more_search_images' %}" + queryString + "&page=" + nextPage,
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    var itemsHTML = '';
+                    data.images.forEach(function(image) {
+                        itemsHTML += '<div class="gallery-item">' +
+                                        '<a href="/image/' + image.id + '/">' +
+                                            '<img src="' + image.url + '" alt="' + image.title + '">' +
+                                        '</a>' +
+                                     '</div>';
+                    });
+
+                    var $items = $(itemsHTML);
+
+                    $items.imagesLoaded(function() {
+                        $grid.append($items);
+                        msnry.appended($items);
+                        msnry.layout();
+
+                        if (data.has_next) {
+                            $('#next-page').data('next-page', data.next_page);
+                        } else {
+                            $('#next-page').data('next-page', '');
+                        }
+
+                        loading = false;
+                        $('#loading').hide();
+                    });
+                },
+                error: function() {
+                    loading = false;
+                    $('#loading').hide();
+                }
+            });
+        }
+
+        $(window).on('scroll', function() {
+            var scrollTop = $(this).scrollTop();
+            var windowHeight = $(this).height();
+            var docHeight = $(document).height();
+
+            if (docHeight - windowHeight - scrollTop < 300) {
+                loadMoreSearchImages();
+            }
+        });
+        {% endif %}
     });
 </script>
 {% endblock %}

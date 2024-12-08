@@ -41,6 +41,15 @@
         </form>
     </div>
 
+    <div>
+        <h3>Hozzáadás galériához</h3>
+        <form method="post">
+            {% csrf_token %}
+            {{ gallery_form.as_p }}
+            <button type="submit" name="gallery_form">Hozzáadás a galériához</button>
+        </form>
+    </div>
+
     <!-- Kommentek megjelenítése -->
     <div class="comments-section">
         <h3>Hozzászólások</h3>

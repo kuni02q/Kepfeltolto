@@ -1,28 +1,18 @@
 {% extends 'gallery/base.html' %}
-{% load static %}
 
 {% block content %}
-
+<!-- Galéria részletei -->
 <div class="profile-header">
-    <div class="profile-picture-container">
-        {% if profile_user.profile.profile_image %}
-            <img src="{{ profile_user.profile.profile_image.url }}" alt="{{ profile_user.username }} profilképe" class="profile-picture-large">
-        {% else %}
-            <!-- Alapértelmezett profilkép -->
-            <img src="{% static 'images/default_profile.png' %}" alt="Alapértelmezett profilkép" class="profile-picture-large">
-        {% endif %}
-    </div>
     <div class="profile-info">
-        <h2>{{ profile_user.username }}</h2>
-        <p>{{ user.profile.bio }}</p>
+        <h1>{{ gallery.name }}</h1>
+        <p>{{ gallery.description }}</p>
     </div>
 </div>
 
-
-<h3>Feltöltött képek:</h3>
-<div class="profile-gallery">
-    {% if images %}
-        {% for image in images %}
+<!-- Képek listázása a galériában -->
+<div id="image-view" class="profile-gallery">
+    {% if gallery.images.all %}
+        {% for image in gallery.images.all %}
         <div class="gallery-item">
             <a href="{% url 'image_detail' image.pk %}">
                 <img src="{{ image.image_file.url }}" alt="{{ image.title }}">
@@ -30,7 +20,7 @@
         </div>
         {% endfor %}
     {% else %}
-        <p>Még nem töltött fel képeket.</p>
+        <p>A galéria még nem tartalmaz képeket.</p>
     {% endif %}
 </div>
 

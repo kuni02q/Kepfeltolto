@@ -123,31 +123,55 @@ h1, h2, h3 {
     color: #8E8D8A;
 }
 
-/* Kereső űrlap stílusai */
-.search-form {
-    display: table;
-    margin: auto;
+/* Kereső konténer */
+.search-container {
+    background-color: var(--form-bg);
+    border: 1px solid var(--form-border);
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 600px;
+    margin: 30px auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.search-form input[type="text"] {
-    padding: 8px;
-    font-size: 1em;
-    width: 400px;
-    border: 1px solid #ccc;
+/* Kereső mezők és gombok egymás mellett */
+.search-field-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Select2 mezők stílusai */
+.select2-container .select2-selection {
+    background-color: var(--form-bg);
+    color: var(--form-color);
+    border: 1px solid var(--form-border);
     border-radius: 8px;
+    font-size: 16px;
 }
 
-.search-form button {
-    padding: 5px 10px;
-    font-size: 1em;
-    background-color: #8E8D8A;
+/* Hover, fókusz állapot javítása */
+.select2-container--default .select2-selection--multiple:focus,
+.select2-container--default .select2-selection--single:focus {
+    outline: none;
+    box-shadow: 0 0 5px var(--highlight-color);
+    border-color: var(--highlight-color);
+}
+
+/* Gomb stílus */
+.search-field-group button {
+    background-color: var(--highlight-color);
     color: #fff;
     border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
     cursor: pointer;
-    border-radius: 4px;
+    font-size: 16px;
+    transition: background-color 0.3s;
 }
 
-.search-form button:hover {
+.search-field-group button:hover {
     background-color: #E98074;
 }
 
@@ -786,3 +810,5 @@ button[type="submit"] {
 button[type="submit"]:hover {
     background-color: #E98074; /* Világosabb árnyalat hover esetén */
 }
+
+

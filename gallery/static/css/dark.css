@@ -123,34 +123,88 @@ h1, h2, h3 {
     color: #b0b0b0;
 }
 
-/* Kereső űrlap stílusai */
-.search-form {
-    display: table;
-    margin: auto;
+/* Kereső konténer sötét módban */
+.search-container {
+    background: var(--form-bg);
+    border: 1px solid var(--form-border);
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 600px;
+    margin: 30px auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0);
 }
 
-.search-form input[type="text"] {
-    padding: 8px;
-    font-size: 1em;
-    width: 400px;
-    background-color: #2b2b2b;
-    color: #f0f0f0;
-    border: 1px solid #555;
+.search-field-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.select2-container .select2-selection {
+    background: var(--form-bg);
+    color: var(--form-color);
+    border: 1px solid var(--form-border);
     border-radius: 8px;
+    font-size: 16px;
 }
 
-.search-form button {
-    padding: 5px 10px;
-    font-size: 1em;
-    background-color: #555;
-    color: #f0f0f0;
+.select2-container--default .select2-selection--multiple:focus,
+.select2-container--default .select2-selection--single:focus {
+    outline: none;
+    box-shadow: 0 0 5px var(--highlight-color);
+    border-color: var(--highlight-color);
+}
+
+.search-field-group button {
+    background: var(--highlight-color);
+    color: #ffffff;
     border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: background-color 0.3s;
     cursor: pointer;
-    border-radius: 4px;
 }
 
-.search-form button:hover {
-    background-color: #ffa07a;
+.search-field-group button:hover {
+    background: #ff7f50;
+}
+
+/* Select2 dropdown és opciók színezése szürke háttérrel és fekete szöveggel */
+.select2-container--default .select2-dropdown {
+    background: #ccc; /* Világosszürke háttér a dropdownban */
+    border: 1px solid #aaa;
+}
+
+.select2-results__option {
+    background: #ccc;
+    color: #000; /* Fekete szöveg */
+    padding: 8px;
+}
+
+.select2-results__option--highlighted {
+    background: #bbb; /* Sötétebb szürke hover esetén */
+    color: #000;
+}
+
+/* Kiválasztott címkék megjelenése a többválasztós mezőben */
+.select2-selection__choice {
+    background: #ccc; /* Szürke háttér a kiválasztott címkéken */
+    color: #000;     /* Fekete szöveg */
+    border: none;
+    border-radius: 4px;
+    margin: 2px;
+    padding: 2px 5px;
+}
+
+.select2-selection__choice__remove {
+    color: #000; /* A kis 'x' gomb is fekete */
+    margin-right: 5px;
+}
+
+.select2-selection__choice__remove:hover {
+    color: #fff; /* Hover esetén fehér, hogy látszódjon a kontraszt */
 }
 
 /* Galéria stílusai */
