@@ -7,7 +7,13 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.db import models
 
-from .models import Comment, Image, Profile, Tag
+from .models import Comment, Gallery, Image, Profile, Tag
+
+
+class GalleryForm(forms.ModelForm):
+    class Meta:
+        model = Gallery
+        fields = ["name", "cover_image"]
 
 
 class ImageForm(forms.ModelForm):
@@ -37,10 +43,20 @@ class ImageForm(forms.ModelForm):
         self.fields["tags"].queryset = Tag.objects.all().order_by("name")
 
 
+class AddImageToGalleryForm(forms.Form):
+    gallery = forms.ModelChoiceField(
+        queryset=Gallery.objects.none(),
+        empty_label="Válassz egy galériát",
+        required=True,
+    )
+
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["gallery"].queryset = Gallery.objects.filter(owner=user)
+
+
 class SignUpForm(UserCreationForm):
-    error_messages = {
-        'password_mismatch': "A két jelszó nem egyezik meg."
-    }
+    error_messages = {"password_mismatch": "A két jelszó nem egyezik meg."}
     email = forms.EmailField(required=True)
     first_name = forms.CharField(
         max_length=30, required=False, help_text="Nem kötelező."
@@ -98,10 +114,12 @@ class SearchForm(forms.Form):
 
 
 class CommentForm(forms.ModelForm):
-    content = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Add a comment...'}))
+    content = forms.CharField(
+        widget=forms.TextInput(attrs={"placeholder": "Add a comment..."})
+    )
 
     class Meta:
         model = Comment
         fields = ["content", "parent"]
         labels = {"content": "", "parent": ""}
-        widgets = {'parent': forms.HiddenInput()}
+        widgets = {"parent": forms.HiddenInput()}

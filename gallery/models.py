@@ -1,4 +1,4 @@
-#models.py
+# models.py
 import base64
 
 import openai
@@ -20,6 +20,23 @@ class Tag(models.Model):
         return self.name
 
 
+class Gallery(models.Model):
+    name = models.CharField(max_length=100)
+    cover_image = models.ImageField(upload_to="gallery_covers/", null=True, blank=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="galleries")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+    def create_liked_gallery(self):
+        """Ez létrehozza a 'Tetszik' galériát, ha még nem létezik."""
+        if not Gallery.objects.filter(name="Tetszik", owner=self.user).exists():
+            gallery = Gallery(name="Tetszik", owner=self.user)
+            gallery.save()
+        return Gallery.objects.get(name="Tetszik", owner=self.user)
+
+
 class Image(models.Model):
     uploader = models.ForeignKey(
         User, related_name="uploaded_images", on_delete=models.CASCADE
@@ -31,6 +48,9 @@ class Image(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     likes = models.ManyToManyField(User, related_name="image_likes", blank=True)
     dislikes = models.ManyToManyField(User, related_name="image_dislikes", blank=True)
+    gallery = models.ForeignKey(
+        Gallery, on_delete=models.SET_NULL, related_name="images", null=True, blank=True
+    )
 
     def total_likes(self):
         return self.likes.count()
@@ -46,7 +66,9 @@ class Comment(models.Model):
     image = models.ForeignKey(Image, related_name="comments", on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
+    parent = models.ForeignKey(
+        "self", null=True, blank=True, related_name="replies", on_delete=models.CASCADE
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -66,32 +88,41 @@ class Profile(models.Model):
 
 class Message(models.Model):
     MESSAGE_TYPE_CHOICES = [
-        ('like', 'Like'),
-        ('comment', 'Comment'),
-        ('message', 'Message'),
+        ("like", "Like"),
+        ("comment", "Comment"),
+        ("message", "Message"),
     ]
 
     sender = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='sent_messages', null=True, blank=True
+        User,
+        on_delete=models.CASCADE,
+        related_name="sent_messages",
+        null=True,
+        blank=True,
     )
     recipient = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='received_messages'
+        User, on_delete=models.CASCADE, related_name="received_messages"
     )
     subject = models.CharField(max_length=255, blank=True)
     body = models.TextField(blank=True)
     is_read = models.BooleanField(default=False)
     sent_at = models.DateTimeField(auto_now_add=True)
     message_type = models.CharField(
-        max_length=10,
-        choices=MESSAGE_TYPE_CHOICES,
-        default='message'
+        max_length=10, choices=MESSAGE_TYPE_CHOICES, default="message"
     )
     related_image = models.ForeignKey(
-        'Image', on_delete=models.CASCADE, null=True, blank=True, related_name='notifications'
+        "Image",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="notifications",
     )
 
     def __str__(self):
-        return f"{self.get_message_type_display()} from {self.sender} to {self.recipient}"
+        return (
+            f"{self.get_message_type_display()} from {self.sender} to {self.recipient}"
+        )
+
 
 class FavoriteImage(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
