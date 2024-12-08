@@ -27,7 +27,7 @@ from .forms import (
     SearchForm,
     SignUpForm,
 )
-from .models import Comment, FavoriteImage, Gallery, Image, Message, Profile, Tag
+from .models import Comment, FavoriteImage, Gallery, Image, Message, Profile, Tag, FollowedUser
 
 
 def image_list(request):
@@ -279,11 +279,28 @@ def friend_search(request):
             | Q(first_name__icontains=query)
             | Q(last_name__icontains=query)
         )
-        # Ha azt akarjuk, hogy ha üresen hagyjuk a keresési mezőt, ne dobjon egyetlen felhasználót se, akkor el kell tüntetni a kommentet:
-    """else:
-        users = User.objects.none()  # Üres queryset, ha nincs keresési feltétel"""
+
+    # Ha a kérés POST, akkor ezt jelenti, hogy a "Mentés" gombra kattintottak
+    if request.method == 'POST':
+        follow_user_id = request.POST.get('follow_user_id')
+        if follow_user_id:
+            try:
+                followed_user = User.objects.get(pk=follow_user_id)
+                FollowedUser.objects.get_or_create(
+                    follower=request.user,
+                    followed_user=followed_user
+                )
+                messages.success(request, f"{followed_user.username} elmentve a követettek közé")
+            except User.DoesNotExist:
+                messages.error(request, "A kiválasztott felhasználó nem létezik.")
+
+        # A POST kezelés után is jó, ha újra visszatérünk a kereső oldalra
+        return redirect('friend_search')
+
     return render(
-        request, "gallery/friend_search.html", {"users": users, "query": query}
+        request,
+        "gallery/friend_search.html",
+        {"users": users, "query": query}
     )
 
 
@@ -491,3 +508,13 @@ def load_more_search_images(request):
         "next_page": page_obj.next_page_number() if page_obj.has_next() else None,
     }
     return JsonResponse(data)
+
+
+@login_required
+def followed_users(request):
+    # Feltételezve, hogy van egy FollowedUser modell, ami tárolja mely felhasználót ki követ
+    followed_entries = FollowedUser.objects.filter(follower=request.user)
+    # Ezek a bejelentkezett felhasználó által követett (megjelölt) felhasználók
+    followed_list = [entry.followed_user for entry in followed_entries]
+
+    return render(request, 'gallery/followed_users.html', {'followed_list': followed_list})

@@ -1,0 +1,24 @@
+{% extends 'gallery/base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Megjelölt felhasználók</h2>
+{% if followed_list %}
+    <div class="profiles-grid">
+        {% for user in followed_list %}
+        <div class="profiles-item">
+            <a href="{% url 'profile' user.username %}">
+                {% if user.profile and user.profile.profile_image %}
+                    <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }} profilképe" class="profile-picture">
+                {% else %}
+                    <img src="{% static 'images/default_profile.png' %}" alt="Alapértelmezett profilkép" class="profile-picture">
+                {% endif %}
+                <p>{{ user.username }} ({{ user.first_name }} {{ user.last_name }})</p>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>Még nem jelöltél meg senkit.</p>
+{% endif %}
+{% endblock %}

@@ -142,6 +142,23 @@ h1, h2, h3 {
     justify-content: center;
 }
 
+.search-field-group input[type="text"] {
+    width: 100%;
+    max-width: 300px;
+    padding: 10px;
+    border: 1px solid var(--form-border);
+    border-radius: 8px;
+    background: var(--form-bg);
+    color: var(--form-color);
+    font-size: 16px;
+}
+
+.search-field-group input[type="text"]:focus {
+    outline: none;
+    box-shadow: 0 0 5px var(--highlight-color);
+    border-color: var(--highlight-color);
+}
+
 /* Select2 mezők stílusai */
 .select2-container .select2-selection {
     background-color: var(--form-bg);
@@ -173,6 +190,26 @@ h1, h2, h3 {
 
 .search-field-group button:hover {
     background-color: #E98074;
+}
+
+/* Megjelölt felhasználók gomb */
+.followed-users-link-container {
+    text-align: center;
+    margin: 20px;
+}
+
+.followed-link-btn {
+    background: var(--highlight-color);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.followed-link-btn:hover {
+    background: #ff7f50;
 }
 
 /* Galéria stílusai */
@@ -346,7 +383,7 @@ footer {
     margin: 20px auto;
     padding: 20px;
     text-align: left;
-    background-color: #fff; /* Világos háttér */
+    background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
@@ -392,7 +429,7 @@ footer {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    background-color: #fff; /* Világos háttér a beviteli mezőknek */
+    background-color: #fff;
     color: #333;
 }
 
@@ -402,7 +439,7 @@ footer {
 }
 
 .error {
-    color: #ff4d4d; /* Piros hibaüzenet */
+    color: #ff4d4d;
     font-size: 0.9em;
 }
 
@@ -728,23 +765,100 @@ footer {
     background-color: #E98074;
 }
 
-/* Profilok listája */
+/* Profilok listája - barát keresőnél és megjelölt felhasználóknál */
 .profiles-grid {
-    margin: 0 auto;
-}
-
-.profiles-item {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 30px;
 }
 
-.profile-picture {
-    width: 50px;
-    height: 50px;
+/* A .profiles-item mostantól egy függőleges flex konténer, 
+   ami segít a gombot alulra igazítani. */
+.profiles-item {
+    background: var(--form-bg);
+    border: 1px solid var(--form-border);
+    border-radius: 10px;
+    padding: 20px;
+    width: 200px; /* Egységes szélesség */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Az elemek közötti hely kitöltés, gomb az aljára kerül */
+    align-items: center; /* Középre igazítás vízszintesen */
+}
+
+/* A linkre kattintható felület, a kép és a nevek egy wrapperbe rakva */
+.profiles-item a {
+    text-decoration: none;
+    color: var(--form-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px; /* Kis tér a kép és a szöveg között */
+    width: 100%;
+}
+.profile-picture{
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     object-fit: cover;
-    margin-right: 10px;
+    display: block;
+}
+/* Fix méretű kép, hogy ne torzuljon: kerek, 100x100, object-fit: cover */
+.profile-picture-large {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+/* A név legyen középen, 
+   ha szükséges több sor, de a doboz fix magasságával is számolhatunk */
+.profile-username {
+    font-weight: bold;
+    color: var(--form-color);
+    text-align: center;
+}
+
+.profile-realname {
+    font-size: 0.9em;
+    color: var(--help-color);
+    text-align: center;
+}
+
+/* A gomb tároló form */
+.follow-form {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: auto; /* Ez biztosítja, hogy a gomb lent legyen */
+}
+
+/* Egységes gomb stílus, azonos méret, középre igazítva */
+.follow-btn {
+    background: var(--highlight-color);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px; /* Kis margó a tartalomtól */
+}
+
+.follow-btn:hover {
+    background: #ff7f50;
+}
+
+.no-results, .no-query {
+    text-align: center;
+    color: var(--help-color);
+    font-size: 1em;
+    margin-top: 20px;
 }
 /* GYIK szekció */
 .faq-section {
@@ -752,21 +866,21 @@ footer {
 }
 
 .faq-item {
-    background-color: #f9f9f9; /* Világos háttérszín */
+    background-color: #f9f9f9;
     padding: 15px;
     border-radius: 5px;
     margin-bottom: 10px;
-    border: 1px solid #ccc; /* Vékony szegély a doboz körül */
+    border: 1px solid #ccc;
 }
 
 .faq-item h4 {
     margin: 0 0 10px;
-    color: #E85A4F; /* Téma szín */
+    color: #E85A4F;
 }
 
 .faq-item p {
     margin: 0;
-    color: #333; /* Sötétebb szövegszín a jobb olvashatóság érdekében */
+    color: #333;
 }
 
 /* Segítségkérés űrlap */
@@ -775,7 +889,7 @@ footer {
 }
 
 .help-section h3 {
-    color: #E85A4F; /* Téma szín */
+    color: #E85A4F;
 }
 
 .form-group {
@@ -792,14 +906,14 @@ footer {
 .form-group textarea {
     width: 100%;
     padding: 10px;
-    background-color: #fff; /* Világos háttérszín */
+    background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 5px;
     color: #333;
 }
 
 button[type="submit"] {
-    background-color: #E85A4F; /* Téma szín */
+    background-color: #E85A4F;
     border: none;
     padding: 10px 20px;
     color: #fff;
@@ -808,7 +922,5 @@ button[type="submit"] {
 }
 
 button[type="submit"]:hover {
-    background-color: #E98074; /* Világosabb árnyalat hover esetén */
+    background-color: #E98074;
 }
-
-

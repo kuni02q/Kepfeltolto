@@ -134,3 +134,11 @@ class FavoriteImage(models.Model):
 
     def __str__(self):
         return f"{self.user.username} kedveli ezt a képet: {self.image.title}"
+    
+class FollowedUser(models.Model):
+    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followed_set')
+    followed_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followers_set')
+    followed_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.follower.username} követi {self.followed_user.username}-t"

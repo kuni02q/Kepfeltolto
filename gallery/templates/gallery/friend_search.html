@@ -3,25 +3,56 @@
 
 {% block content %}
 <h2>Barát keresés</h2>
-<form method="get">
-    <input type="text" name="q" placeholder="Felhasználónév, keresztnév vagy vezetéknév">
-    <button type="submit">Keresés</button>
-</form>
+
+<div class="search-container">
+    <form method="get" class="search-form">
+        <div class="search-field-group">
+            <input type="text" name="q" placeholder="Felhasználónév, keresztnév vagy vezetéknév" value="{{ query }}" class="search-input">
+            <button type="submit" class="search-btn">Keresés</button>
+        </div>
+    </form>
+</div>
+
+<div class="followed-users-link-container">
+    <a href="{% url 'followed_users' %}" class="followed-link-btn">Megjelölt felhasználók</a>
+</div>
 
 {% if users %}
+    <h3>Keresési eredmények:</h3>
     <div class="profiles-grid">
         {% for user in users %}
         <div class="profiles-item">
-            <a href="{% url 'profile' user.username %}">
-                {% if user.profile.profile_image %}
-                    <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }} profilképe" class="profile-picture">
+            <a href="{% url 'profile' user.username %}" class="profile-link">
+                {% if user.profile and user.profile.profile_image %}
+                    <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }} profilképe" class="profile-picture-large">
                 {% else %}
-                    <img src="{% static 'images/default_profile.png' %}" alt="Alapértelmezett profilkép" class="profile-picture">
+                    <img src="{% static 'images/default_profile.png' %}" alt="Alapértelmezett profilkép" class="profile-picture-large">
                 {% endif %}
-                <p>{{ user.username }} ({{ user.first_name }} {{ user.last_name }})</p>
+                <p class="profile-username">{{ user.username }} 
+                    {% if user.first_name or user.last_name %}
+                        <span class="profile-realname">({{ user.first_name }} {{ user.last_name }})</span>
+                    {% endif %}
+                </p>
             </a>
+            <form method="post" class="follow-form">
+                {% csrf_token %}
+                <input type="hidden" name="follow_user_id" value="{{ user.id }}">
+                <button type="submit" class="follow-btn">Mentés</button>
+            </form>
         </div>
         {% endfor %}
     </div>
+{% else %}
+    {% if query %}
+        <p class="no-results">Nincs találat a keresett kifejezésre.</p>
+    {% else %}
+        <p class="no-query">Kezdd el beírni a keresett nevet.</p>
+    {% endif %}
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Itt további JavaScript kódot adhatsz hozzá, ha szeretnél.
+</script>
 {% endblock %}

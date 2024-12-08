@@ -46,4 +46,5 @@ urlpatterns = [
     path("profile/<str:username>/", views.profile, name="profile"),
     path("gallery/<int:pk>/", views.gallery_detail, name="gallery_detail"),
     path('search/load_more/', views.load_more_search_images, name='load_more_search_images'),
+    path('followed-users/', views.followed_users, name='followed_users'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

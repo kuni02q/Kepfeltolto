@@ -141,16 +141,18 @@ h1, h2, h3 {
     justify-content: center;
 }
 
-.select2-container .select2-selection {
-    background: var(--form-bg);
-    color: var(--form-color);
+.search-field-group input[type="text"] {
+    width: 100%;
+    max-width: 300px;
+    padding: 10px;
     border: 1px solid var(--form-border);
     border-radius: 8px;
+    background: var(--form-bg);
+    color: var(--form-color);
     font-size: 16px;
 }
 
-.select2-container--default .select2-selection--multiple:focus,
-.select2-container--default .select2-selection--single:focus {
+.search-field-group input[type="text"]:focus {
     outline: none;
     box-shadow: 0 0 5px var(--highlight-color);
     border-color: var(--highlight-color);
@@ -171,27 +173,44 @@ h1, h2, h3 {
     background: #ff7f50;
 }
 
-/* Select2 dropdown és opciók színezése szürke háttérrel és fekete szöveggel */
+/* Select2 dropdown és opciók */
 .select2-container--default .select2-dropdown {
-    background: #ccc; /* Világosszürke háttér a dropdownban */
+    background: #ccc;
     border: 1px solid #aaa;
 }
 
 .select2-results__option {
     background: #ccc;
-    color: #000; /* Fekete szöveg */
+    color: #000;
     padding: 8px;
 }
 
 .select2-results__option--highlighted {
-    background: #bbb; /* Sötétebb szürke hover esetén */
+    background: #bbb;
     color: #000;
 }
+/* Megjelölt felhasználók gomb */
+.followed-users-link-container {
+    text-align: center;
+    margin: 20px;
+}
 
-/* Kiválasztott címkék megjelenése a többválasztós mezőben */
+.followed-link-btn {
+    background: var(--highlight-color);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.followed-link-btn:hover {
+    background: #ff7f50;
+}
 .select2-selection__choice {
-    background: #ccc; /* Szürke háttér a kiválasztott címkéken */
-    color: #000;     /* Fekete szöveg */
+    background: #ccc;
+    color: #000;
     border: none;
     border-radius: 4px;
     margin: 2px;
@@ -199,12 +218,12 @@ h1, h2, h3 {
 }
 
 .select2-selection__choice__remove {
-    color: #000; /* A kis 'x' gomb is fekete */
+    color: #000;
     margin-right: 5px;
 }
 
 .select2-selection__choice__remove:hover {
-    color: #fff; /* Hover esetén fehér, hogy látszódjon a kontraszt */
+    color: #fff;
 }
 
 /* Galéria stílusai */
@@ -212,7 +231,6 @@ h1, h2, h3 {
     margin: 0 auto;
 }
 
-/* Galéria elemek stílusai */
 .gallery-item {
     width: calc(25% - 40px);
     margin: 10px;
@@ -252,7 +270,6 @@ h1, h2, h3 {
     }
 }
 
-/* Kép cím és leírás */
 .gallery-item h3 {
     font-size: 1.2em;
     margin: 10px 0 5px;
@@ -380,8 +397,8 @@ footer {
     margin: 20px auto;
     padding: 20px;
     text-align: left;
-    background-color: #2b2b2b; /* Sötét háttér */
-    color: #f0f0f0; /* Világos szöveg */
+    background-color: #2b2b2b;
+    color: #f0f0f0;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
@@ -427,7 +444,7 @@ footer {
     padding: 8px;
     border: 1px solid #555;
     border-radius: 4px;
-    background-color: #333; /* Sötétebb háttér a beviteli mezőknek */
+    background-color: #333;
     color: #f0f0f0;
 }
 
@@ -437,7 +454,7 @@ footer {
 }
 
 .error {
-    color: #ff4d4d; /* Piros hibaüzenet */
+    color: #ff4d4d;
     font-size: 0.9em;
 }
 
@@ -481,8 +498,8 @@ footer {
 }
 
 .notification-list li {
-    display: flex; /* Hozzáadva, hogy a kép és a szöveg egymás mellett legyen */
-    align-items: center; /* Hozzáadva, hogy a kép és a szöveg vertikálisan középre igazodjon */
+    display: flex;
+    align-items: center;
     padding: 10px;
     margin-bottom: 10px;
     border-bottom: 1px solid #555;
@@ -586,18 +603,14 @@ footer {
     background-color: #ff7f50;
 }
 
-/* Eredeti kód */
+/* Profil galéria */
 .profile-gallery {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     margin: -2px;
-
-    /* Új tulajdonságok a görgetés engedélyezéséhez */
-    /* Tegyük fel, hogy korlátozott magasságot adunk neki,
-       így ha több kép van, scroll-ozni lehessen */
-    max-height: 80vh; /* vagy más érték, ami neked megfelelő */
-    overflow-y: auto; /* engedélyezi a függőleges görgetést */
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
 .profile-gallery .gallery-item {
@@ -616,10 +629,6 @@ footer {
     width: 100%;
     height: auto;
     display: block;
-}
-
-.profile-gallery .gallery-item form {
-    margin: 0;
 }
 
 .profile-gallery .gallery-item button {
@@ -680,14 +689,14 @@ footer {
 
 .comment .comment-content {
     display: flex;
-    align-items: flex-start; /* A szöveg a kép tetejétől indul */
+    align-items: flex-start;
     background-color: #2b2b2b;
     padding: 10px;
     border-radius: 5px;
 }
 
 .comment .profile-picture {
-    flex-shrink: 0; /* A kép nem zsugorodik */
+    flex-shrink: 0;
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -769,25 +778,103 @@ footer {
     background-color: #ff7f50;
 }
 
-/* Profilok listája */
+/* Profilok listája - barát keresőnél és megjelölt felhasználóknál */
+/* Profilok listája - barát keresőnél és megjelölt felhasználóknál */
 .profiles-grid {
-    margin: 0 auto;
-}
-
-.profiles-item {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 50px;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 30px;
 }
 
-.profile-picture {
-    width: 50px;
-    height: 50px;
+/* A .profiles-item mostantól egy függőleges flex konténer, 
+   ami segít a gombot alulra igazítani. */
+.profiles-item {
+    background: var(--form-bg);
+    border: 1px solid var(--form-border);
+    border-radius: 10px;
+    padding: 20px;
+    width: 200px; /* Egységes szélesség */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Az elemek közötti hely kitöltés, gomb az aljára kerül */
+    align-items: center; /* Középre igazítás vízszintesen */
+}
+
+/* A linkre kattintható felület, a kép és a nevek egy wrapperbe rakva */
+.profiles-item a {
+    text-decoration: none;
+    color: var(--form-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px; /* Kis tér a kép és a szöveg között */
+    width: 100%;
+}
+.profile-picture{
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     object-fit: cover;
-    margin-right: 10px;
+    display: block;
 }
+/* Fix méretű kép, hogy ne torzuljon: kerek, 100x100, object-fit: cover */
+.profile-picture-large {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+/* A név legyen középen, 
+   ha szükséges több sor, de a doboz fix magasságával is számolhatunk */
+.profile-username {
+    font-weight: bold;
+    color: var(--form-color);
+    text-align: center;
+}
+
+.profile-realname {
+    font-size: 0.9em;
+    color: var(--help-color);
+    text-align: center;
+}
+
+/* A gomb tároló form */
+.follow-form {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: auto; /* Ez biztosítja, hogy a gomb lent legyen */
+}
+
+/* Egységes gomb stílus, azonos méret, középre igazítva */
+.follow-btn {
+    background: var(--highlight-color);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px; /* Kis margó a tartalomtól */
+}
+
+.follow-btn:hover {
+    background: #ff7f50;
+}
+
+.no-results, .no-query {
+    text-align: center;
+    color: var(--help-color);
+    font-size: 1em;
+    margin-top: 20px;
+}
+
 /* GYIK szekció */
 .faq-section {
     margin: 20px 0;
