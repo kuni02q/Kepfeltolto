@@ -27,7 +27,16 @@ from .forms import (
     SearchForm,
     SignUpForm,
 )
-from .models import Comment, FavoriteImage, Gallery, Image, Message, Profile, Tag, FollowedUser
+from .models import (
+    Comment,
+    FavoriteImage,
+    FollowedUser,
+    Gallery,
+    Image,
+    Message,
+    Profile,
+    Tag,
+)
 
 
 def image_list(request):
@@ -50,6 +59,7 @@ def image_upload(request):
     return render(request, "gallery/image_upload.html", {"form": form})
 
 
+@login_required
 def image_detail(request, pk):
     image = get_object_or_404(Image, pk=pk)
     comments = image.comments.all()
@@ -281,26 +291,25 @@ def friend_search(request):
         )
 
     # Ha a kérés POST, akkor ezt jelenti, hogy a "Mentés" gombra kattintottak
-    if request.method == 'POST':
-        follow_user_id = request.POST.get('follow_user_id')
+    if request.method == "POST":
+        follow_user_id = request.POST.get("follow_user_id")
         if follow_user_id:
             try:
                 followed_user = User.objects.get(pk=follow_user_id)
                 FollowedUser.objects.get_or_create(
-                    follower=request.user,
-                    followed_user=followed_user
+                    follower=request.user, followed_user=followed_user
                 )
-                messages.success(request, f"{followed_user.username} elmentve a követettek közé")
+                messages.success(
+                    request, f"{followed_user.username} elmentve a követettek közé"
+                )
             except User.DoesNotExist:
                 messages.error(request, "A kiválasztott felhasználó nem létezik.")
 
         # A POST kezelés után is jó, ha újra visszatérünk a kereső oldalra
-        return redirect('friend_search')
+        return redirect("friend_search")
 
     return render(
-        request,
-        "gallery/friend_search.html",
-        {"users": users, "query": query}
+        request, "gallery/friend_search.html", {"users": users, "query": query}
     )
 
 
@@ -485,6 +494,7 @@ def load_more_images(request):
     }
     return JsonResponse(data)
 
+
 def load_more_search_images(request):
     page = request.GET.get("page", 1)
     # Szűrés a GET paraméterek alapján (pl. tags)
@@ -500,7 +510,9 @@ def load_more_search_images(request):
 
     images_data = []
     for img in page_obj.object_list:
-        images_data.append({"id": img.id, "url": img.image_file.url, "title": img.title})
+        images_data.append(
+            {"id": img.id, "url": img.image_file.url, "title": img.title}
+        )
 
     data = {
         "images": images_data,
@@ -517,4 +529,6 @@ def followed_users(request):
     # Ezek a bejelentkezett felhasználó által követett (megjelölt) felhasználók
     followed_list = [entry.followed_user for entry in followed_entries]
 
-    return render(request, 'gallery/followed_users.html', {'followed_list': followed_list})
+    return render(
+        request, "gallery/followed_users.html", {"followed_list": followed_list}
+    )
